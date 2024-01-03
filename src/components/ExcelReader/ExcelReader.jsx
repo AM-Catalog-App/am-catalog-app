@@ -16,6 +16,12 @@ function ExcelReader() {
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
+         // Validate file type
+         const allowedTypes = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+         if (!allowedTypes.includes(file.type)) {
+             toast.error('Please upload a valid Excel file (.xls or .xlsx)');
+             return; // Exit the function if file is not an Excel file
+         }
         const reader = new FileReader();
         reader.onload = (e) => {
             const workbook = XLSX.read(e.target.result, { type: 'binary' });
