@@ -1,6 +1,7 @@
-const ProductDetailExcelSheetColumnNames = ["Product Name", "Size", "Style Code", "Color", "Quantity", "Location", "Barcode", "Tag", "Image", "Description", "Collection", "Categories", "MRP"];
+const PRODUCT_DETAIL_EXCEL_COLUMN_NAMES = ['product name', 'size', 'style code', 'colour', 'quantity', 'location', 'barcode', 'tag', 'description', 'collection', 'category', 'mrp'];
+
 
 
 export {
-    ProductDetailExcelSheetColumnNames
+    PRODUCT_DETAIL_EXCEL_COLUMN_NAMES
 }
