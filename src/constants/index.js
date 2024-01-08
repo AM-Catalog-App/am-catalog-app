@@ -1,4 +1,4 @@
-const PRODUCT_DETAIL_EXCEL_COLUMN_NAMES = ['product name', 'size', 'style code', 'colour', 'quantity', 'location', 'barcode', 'tag', 'description', 'collection', 'category', 'mrp'];
+const PRODUCT_DETAIL_EXCEL_COLUMN_NAMES = ['sr no.', 'product name', 'size', 'style code', 'colour', 'quantity', 'location', 'barcode', 'tag', 'description', 'collection', 'category', 'mrp'];
 
 
 

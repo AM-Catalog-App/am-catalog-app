@@ -6,10 +6,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import { PRODUCT_DETAIL_EXCEL_COLUMN_NAMES } from "../../constants/index";
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import { capitalizeFirstLetter } from '../../utils/index';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+import { bulkUploadProducts } from '../../services/index';
 
 function ExcelReader() {
     const [tableData, setTableData] = useState([]);
     const [imageUploads, setImageUploads] = useState({});
+    const [uploadResponse, setUploadResponse] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const findMissingColumns = (columns) => {
         return PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.filter(col => !columns.includes(col));
@@ -66,9 +71,37 @@ function ExcelReader() {
         });
     };
 
+    const handleBulkUpload = async () => {
+        try {
+            const response = await bulkUploadProducts(tableData);
+            setUploadResponse(response); // Set the response data
+            setIsModalOpen(true); // Open the modal
+            toast.success('Products processed');
+        } catch (error) {
+            toast.error('Failed to upload products');
+            console.error('Upload error:', error);
+        }
+    };    
+
+    const renderModalContent = () => (
+        <Box style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'white', padding: '20px' }}>
+            <h2>Upload Results</h2>
+            {uploadResponse && (
+                <>
+                    <h3>Success</h3>
+                    <pre>{uploadResponse.success.count}</pre>
+                    <h3>Failure</h3>
+                    <pre>{uploadResponse.failed.count}</pre>
+                </>
+            )}
+            <button onClick={() => setIsModalOpen(false)}>Close</button>
+        </Box>
+    );
+
     return (
         <div>
             <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
+            <button onClick={handleBulkUpload}>Upload Products</button>
             <TableContainer component={Paper}>
                 <Table>
                 <TableHead>
@@ -109,6 +142,12 @@ function ExcelReader() {
                 </Table>
             </TableContainer>
             <ToastContainer />
+            <Modal
+                open={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            >
+                {renderModalContent()}
+            </Modal>
         </div>
     );
 }
