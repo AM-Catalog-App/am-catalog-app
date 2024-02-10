@@ -17,7 +17,7 @@ function ExcelReader() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const findMissingColumns = (columns) => {
-        return PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.filter(col => !columns.includes(col));
+        return PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.filter(col => !columns.includes(col.toLowerCase()));
     };
 
     const handleFileUpload = (event) => {
