@@ -9,6 +9,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Box,
   IconButton,
 } from "@mui/material";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,7 +17,6 @@ import { PRODUCT_DETAIL_EXCEL_COLUMN_NAMES } from "../../constants/constants";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import { capitalizeFirstLetter } from "../../utils/index";
 import Modal from "@mui/material/Modal";
-import Box from "@mui/material/Box";
 import { bulkUploadProducts } from "../../services/index";
 
 function ExcelReader() {
