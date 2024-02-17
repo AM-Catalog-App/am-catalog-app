@@ -1,13 +1,14 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import ExcelReader from '../../components/excelReader/ExcelReader';
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import ExcelReader from "../../components/ExcelReader/ExcelReader";
 
 function AdminPortal() {
   return (
-    <Router>
       <div>
         <nav>
           <ul>
-            <li><Link to="/excel-reader">Excel Reader</Link></li>
+            <li>
+              <Link to="/excel-reader">Excel Reader</Link>
+            </li>
           </ul>
         </nav>
 
@@ -15,7 +16,6 @@ function AdminPortal() {
           <Route path="/excel-reader" element={<ExcelReader />} />
         </Routes>
       </div>
-    </Router>
   );
 }
 
