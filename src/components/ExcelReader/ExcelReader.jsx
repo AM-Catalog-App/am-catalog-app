@@ -3,7 +3,7 @@ import * as XLSX from 'xlsx';
 import { ToastContainer, toast } from 'react-toastify';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import 'react-toastify/dist/ReactToastify.css';
-import {ProductDetailExcelSheetColumnNames} from '../../constants/index';
+import {ProductDetailExcelSheetColumnNames} from '../../constants/constants';
 
 function ExcelReader() {
     const [tableData, setTableData] = useState([]);
