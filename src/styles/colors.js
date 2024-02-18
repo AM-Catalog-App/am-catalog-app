@@ -1,4 +1,4 @@
-export const colors = {
+const colors = {
     dark4: "#313131",   // Primary Text
     dark3: "#616161",   // Header, Label Placeholder text
     dark2: "#919191",   // Secondary text
@@ -8,3 +8,5 @@ export const colors = {
     light1: "#F5F5F7",  // Background Table Placeholder
     white: "#F6F1EB"    // Light Background
 }
+
+export default colors;

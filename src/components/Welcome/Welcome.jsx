@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import amLogin from "../../assets/amLogin.svg";
+import amLogin from "../../assets/amLogo.svg";
 
 function Login() {
   return (
