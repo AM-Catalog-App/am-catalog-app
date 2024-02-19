@@ -7,6 +7,7 @@ import ExcelReader from "./components/ExcelReader/ExcelReader";
 import Catalog from "./features/catalog/Catalog";
 import { ThemeProvider } from "@mui/material";
 import amTheme from "./styles/amTheme";
+import ClientProductDetail from "./features/clientProductDetail/ClientProductDetail";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/admin" element={<AdminPortal />} />
           <Route path="/excel-reader" element={<ExcelReader />} />
           <Route path="/catalog" element={<Catalog />} />
+          <Route path="/product-detail" element={<ClientProductDetail />} />
         </Routes>
       </Router>
     </ThemeProvider>
