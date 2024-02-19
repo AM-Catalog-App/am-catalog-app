@@ -8,6 +8,7 @@ import Catalog from "./features/catalog/Catalog";
 import { ThemeProvider } from "@mui/material";
 import amTheme from "./styles/amTheme";
 import Category from "./features/category/Category";
+import ClientProductDetail from "./features/clientProductDetail/ClientProductDetail";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/excel-reader" element={<ExcelReader />} />
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/category/:categoryName" element={<Category />} />
+          <Route path="/product-detail" element={<ClientProductDetail />} />
         </Routes>
       </Router>
     </ThemeProvider>

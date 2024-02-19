@@ -9,26 +9,26 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Box,
-  IconButton,
 } from "@mui/material";
 import "react-toastify/dist/ReactToastify.css";
-import { PRODUCT_DETAIL_EXCEL_COLUMN_NAMES } from "../../constants/constants";
-import PhotoCamera from "@mui/icons-material/PhotoCamera";
+import { PRODUCT_DETAIL_EXCEL_COLUMN_NAMES } from "../../constants/constants.js";
 import { capitalizeFirstLetter } from "../../utils/index";
 import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
 import { bulkUploadProducts } from "../../services/index";
+import ProductImageUploader from "../ProductImageUploader/ProductImageUploader";
 
 function ExcelReader() {
   const [tableData, setTableData] = useState([]);
-  const [imageUploads, setImageUploads] = useState({});
   const [uploadResponse, setUploadResponse] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showUploadImageColumn, setShowUploadImageColumn] = useState(true);
+  const [isProductImageUploaderOpen, setIsProductImageUploaderOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState("");
+  const [selectedBarCode, setSelectedBarCode] = useState("");
 
   const findMissingColumns = (columns) => {
-    return PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.filter(
-      (col) => !columns.includes(col)
-    );
+    return PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.filter((col) => !columns.includes(col.toLowerCase()));
   };
 
   const handleFileUpload = (event) => {
@@ -56,10 +56,11 @@ function ExcelReader() {
         const data = XLSX.utils.sheet_to_json(worksheet).map((row) => {
           let newRow = {};
           Object.keys(row).forEach((key) => {
-            newRow[key.toLowerCase()] = row[key];
+            newRow[key.toLowerCase()] = typeof row[key] === 'string' ? row[key].trim() : row[key];
           });
           return newRow;
         });
+        console.log(data, "data");
         setTableData(data);
       } else {
         toast.error(`Missing columns: ${missingColumns.join(", ")}`);
@@ -68,30 +69,20 @@ function ExcelReader() {
     reader.readAsBinaryString(file);
   };
 
-  const handleImageUpload = (rowIndex, event) => {
-    console.log(rowIndex, "imageUploads");
-    const files = Array.from(event.target.files);
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result;
-        setImageUploads((prev) => {
-          const newRowImages = prev[rowIndex]
-            ? [...prev[rowIndex], base64String]
-            : [base64String];
-          return { ...prev, [rowIndex]: newRowImages };
-        });
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
   const handleBulkUpload = async () => {
     try {
       const response = await bulkUploadProducts(tableData);
-      setUploadResponse(response); // Set the response data
-      setIsModalOpen(true); // Open the modal
+      setUploadResponse(response);
+      console.log(response, "response");
+      setIsModalOpen(true);
       toast.success("Products processed");
+
+      // Update tableData with the products received in the response
+      if (response.success && response.success.products) {
+        const updatedTableData = response.success.products;
+        setTableData(updatedTableData);
+        setShowUploadImageColumn(true);
+      }
     } catch (error) {
       toast.error("Failed to upload products");
       console.error("Upload error:", error);
@@ -133,51 +124,46 @@ function ExcelReader() {
               {PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.map(
                 (header, index) =>
                   header !== "Image" && (
-                    <TableCell key={index}>
-                      {capitalizeFirstLetter(header)}
-                    </TableCell>
+                    <TableCell key={index}>{capitalizeFirstLetter(header)}</TableCell>
                   )
               )}
-              <TableCell>Upload Image</TableCell> {/* New Column Header */}
+              {showUploadImageColumn && <TableCell>Upload Image</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
             {tableData.map((row, rowIndex) => (
               <TableRow key={rowIndex}>
-                {PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.map(
-                  (header, colIndex) =>
-                    header !== "Image" && (
-                      <TableCell key={colIndex}>{row[header]}</TableCell>
-                    )
-                )}
-                <TableCell>
-                  <input
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    id={`icon-button-file-${rowIndex}`}
-                    type="file"
-                    multiple
-                    onChange={(e) => handleImageUpload(rowIndex, e)}
-                  />
-                  <label htmlFor={`icon-button-file-${rowIndex}`}>
-                    <IconButton
-                      color="primary"
-                      aria-label="upload pictures"
-                      component="span"
+                {PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.map((header, colIndex) => {
+                  if (header !== "Image") {
+                    if (header === "sr no.") {
+                      return <TableCell key={colIndex}>{rowIndex + 1}</TableCell>;
+                    }
+                    if (header === "product name") {
+                      return (
+                        <TableCell key={colIndex}>{row[header] || row["productName"]}</TableCell>
+                      );
+                    }
+                    if (header === "style code") {
+                      return (
+                        <TableCell key={colIndex}>{row[header] || row["styleCode"]}</TableCell>
+                      );
+                    }
+                    return <TableCell key={colIndex}>{row[header]}</TableCell>;
+                  }
+                })}
+                {showUploadImageColumn && (
+                  <TableCell>
+                    <button
+                      onClick={() => {
+                        setIsProductImageUploaderOpen(true);
+                        setSelectedProductId(row._id);
+                        setSelectedBarCode(row.barcode);
+                      }}
                     >
-                      <PhotoCamera />
-                    </IconButton>
-                  </label>
-                  {imageUploads[rowIndex] &&
-                    imageUploads[rowIndex].map((imageData, index) => (
-                      <img
-                        key={index}
-                        src={imageData}
-                        alt={`Uploaded ${index}`}
-                        style={{ height: "50px", marginRight: "5px" }}
-                      />
-                    ))}
-                </TableCell>
+                      Upload
+                    </button>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
@@ -187,6 +173,14 @@ function ExcelReader() {
       <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
         {renderModalContent()}
       </Modal>
+      {isProductImageUploaderOpen && (
+        <ProductImageUploader
+          productId={selectedProductId}
+          barcode={selectedBarCode}
+          open={isProductImageUploaderOpen}
+          onClose={() => setIsProductImageUploaderOpen(false)}
+        />
+      )}
     </div>
   );
 }
