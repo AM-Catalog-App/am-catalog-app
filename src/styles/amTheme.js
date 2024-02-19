@@ -191,7 +191,7 @@ const amTheme = createTheme({
         },
     },
 
-    spacing: 4, // Adjust the base spacing unit
+    spacing: [0, 4, 8, 16, 32, 64], // Adjust the base spacing unit
 });
 
 export default amTheme;
