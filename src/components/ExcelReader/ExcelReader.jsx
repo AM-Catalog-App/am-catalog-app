@@ -11,7 +11,7 @@ import {
   Paper,
 } from "@mui/material";
 import "react-toastify/dist/ReactToastify.css";
-import { PRODUCT_DETAIL_EXCEL_COLUMN_NAMES } from "../../constants/index";
+import { PRODUCT_DETAIL_EXCEL_COLUMN_NAMES } from "../../constants/constants.js";
 import { capitalizeFirstLetter } from "../../utils/index";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
