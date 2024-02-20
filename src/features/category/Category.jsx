@@ -83,6 +83,8 @@ function FilterMenu({
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleFilterClose}
+        p={5}
+        sx={{ padding: "20px" }}
       >
         {/* {Object.entries(filters).map(([category, values]) => (
           <MenuItem key={category}>
@@ -127,7 +129,7 @@ function FilterMenu({
         ))} */}
 
         {Object.entries(filters).map(([category, values]) => (
-          <Accordion key={category}>
+          <Accordion sx={{ padding: "10px" }} key={category}>
             <AccordionSummary expandIcon={<ExpandMore />}>
               {category}
             </AccordionSummary>
@@ -175,8 +177,6 @@ function Category() {
   const [loading, setLoading] = useState(true);
   const [hasNextPage, setHasNextPage] = useState(true);
   const [products, setProducts] = useState([]);
-  const [colour, setColour] = useState("");
-  const [location, setLocation] = useState("");
   const [search, setSearch] = useState("");
   const [totalProducts, setTotalProducts] = useState(0);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
