@@ -1,0 +1,33 @@
+.productCarousel {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.productCarousel img {
+  height: 150px;
+  width: auto;
+}
+
+.productCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* padding: 8px; */
+  /* margin: 2rem; */
+  margin-bottom: 16px;
+}
+
+.productCard img {
+  height: 200px;
+  width: auto;
+  left: 0px;
+  margin-bottom: 8px;
+}
+
+.productName {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

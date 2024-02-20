@@ -1,13 +1,19 @@
 import { Box } from "@mui/material";
-import amLogin from "../../assets/amLogo.svg";
+import amLogo from "../../assets/amLogo1.png";
 
-function Login() {
+function Welcome() {
   return (
-    <Box>
-      <img src={amLogin} alt="Anju Modi" />
-      {/* Just a Placeholder Image, looks trash right now, need better image */}
-    </Box>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: " center" /* Center horizontally */,
+        alignItems: "center" /* Center vertically */,
+        height: "98vh",
+      }}
+    >
+      <img src={amLogo} height={"200px"} alt="Anju Modi" />
+    </div>
   );
 }
 
-export default Login;
+export default Welcome;

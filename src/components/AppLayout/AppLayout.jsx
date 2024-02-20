@@ -25,7 +25,9 @@ function AppLayout({ children }) {
         sx={{
           backgroundColor: colors.light1,
           height: "100%",
-          marginBottom: "10px",
+          marginBottom: "50px",
+          // paddingLeft: "10px",
+          // paddingRight: "10px",
         }}
       >
         {children}
@@ -42,7 +44,7 @@ export function FixedBottomNavigation() {
   const ref = useRef(null);
 
   return (
-    <Box sx={{ pb: 7 }} ref={ref}>
+    <Box sx={{ pb: 5 }} ref={ref}>
       <CssBaseline />
 
       <Paper
@@ -58,7 +60,7 @@ export function FixedBottomNavigation() {
           showLabels
           value={value}
           sx={{
-            backgroundColor: colors.light1,
+            backgroundColor: colors.white,
           }}
           onChange={(event, newValue) => {
             setValue(newValue);
