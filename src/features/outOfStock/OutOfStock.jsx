@@ -19,15 +19,11 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useInfiniteScroll from "react-infinite-scroll-hook";
-import {
-  getBestsellers,
-  getProducts,
-  getFilters,
-} from "../../services/catalog";
+import { getOutOfStockProducts } from "../../services/catalog";
 import useIsMobile from "../../utils/useIsMobile";
 import AppLayout from "../../components/AppLayout/AppLayout";
 import colors from "../../styles/colors";
-import classes from "./category.module.css";
+// import classes from "./category.module.css";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { ExpandMore } from "@mui/icons-material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -166,12 +162,12 @@ function FilterMenu({
   );
 }
 
-function Category() {
-  const { categoryName } = useParams();
+function OutOfStock() {
+  //   const { categoryName } = useParams();
   const navigate = useNavigate();
-  const displayCategoryName =
-    categoryName[0].charAt(0).toUpperCase() +
-    categoryName.slice(1).toLowerCase();
+  //   const displayCategoryName =
+  //     categoryName[0].charAt(0).toUpperCase() +
+  //     categoryName.slice(1).toLowerCase();
   const isMobile = useIsMobile();
   const [bestsellers, setBestsellers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -189,29 +185,30 @@ function Category() {
   };
 
   useEffect(() => {
-    fetchFilters();
-    fetchBestsellers();
-    loadMoreProducts();
+    //   fetchFilters();
+    //   fetchBestsellers();
+    loadMoreProducts(true);
     return () => {};
   }, []);
 
-  useEffect(() => {
-    loadMoreProducts(true);
-  }, [selectedColours, selectedLocations]);
+  //   useEffect(() => {
+  //     loadMoreProducts(true);
+  //   }, [selectedColours, selectedLocations]);
 
   const loadMoreProducts = async (reset = "false") => {
     try {
       setLoading(true);
       let startIndex = reset ? 0 : products?.length,
         endIndex = reset ? 10 : products?.length + 10;
-      const { total, products: tempProducts } = await getProducts({
-        category: categoryName,
-        startIndex,
-        endIndex,
-        colour: selectedColours,
-        location: selectedLocations,
-        search,
-      });
+      const { total, outOfStockProducts: tempProducts } =
+        await getOutOfStockProducts({
+          category: "",
+          startIndex,
+          endIndex,
+          colour: selectedColours,
+          location: selectedLocations,
+          search,
+        });
       if (total !== totalProducts) setTotalProducts(total);
       if (reset === true) {
         setProducts([...tempProducts]);
@@ -286,23 +283,10 @@ function Category() {
             </IconButton>
           </Grid>
           <Grid item xs={10} textAlign="center">
-            <Typography variant="h1">{displayCategoryName}</Typography>
+            <Typography variant="h1">Customer Section</Typography>
           </Grid>
         </Grid>
-        <Grid item pl={2} mt={3} sx={{ width: "100%" }}>
-          {/*  carousel content goes here */}
-          <Box sx={{ display: "flex", overflowX: "auto" }}>
-            {bestsellers?.map((bestseller) => (
-              <img
-                key={bestseller?._id}
-                height={isMobile ? "150px" : "200px"}
-                src={bestseller?.imageUrls[0]}
-                // alt={`Image ${index + 1}`}
-                style={{ marginRight: "8px" }}
-              />
-            ))}
-          </Box>
-        </Grid>
+
         <Grid
           container
           item
@@ -315,7 +299,7 @@ function Category() {
         >
           <Grid item xs={4}>
             <Typography variant="h5">
-              {totalProducts} {displayCategoryName}
+              {/* {totalProducts} {displayCategoryName} */}
             </Typography>
           </Grid>
 
@@ -329,9 +313,6 @@ function Category() {
                 setSelectedLocations={setSelectedLocations}
                 setSelectedColours={setSelectedColours}
               />
-              {/* <IconButton onClick={handleFilterClick} sx={iconStyle}>
-                <FilterListIcon />
-              </IconButton> */}
             </Box>
           </Grid>
 
@@ -343,7 +324,7 @@ function Category() {
                 id="input-with-icon-textfield"
                 label={
                   <Typography sx={{ fontSize: "0.75rem" }}>
-                    Search {displayCategoryName}
+                    Search Customs
                   </Typography>
                 }
                 // variant="standard"
@@ -392,10 +373,10 @@ function Category() {
                 p={2}
                 alignItems="center"
               >
-                <Grid item onClick={()=>[navigate("/product-detail")]}>
+                <Grid item>
                   <img
                     key={product?._id}
-                    src={product?.imageUrl}
+                    src={product?.imageUrls[0]}
                     height={isMobile ? "200px" : "300px"}
                     width={"auto"}
                     onError={(e) => {
@@ -424,43 +405,6 @@ function Category() {
           ))}
         </Grid>
 
-        {/* <Grid container direction="row" spacing={2} mb={3}>
-          {products.map((product) => (
-            <Grid item xs={6} md={3} key={product._id}>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <img
-                  src={product.imageUrl}
-                  alt={product._id}
-                  style={{ marginBottom: "8px" }}
-                />
-                <Typography
-                  variant="body1"
-                  textAlign="center"
-                  sx={{
-                    maxWidth: "100%",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {product.productName}
-                </Typography>
-                <Typography variant="body1">
-                  Style Code - {product.styleCode}
-                </Typography>
-                <Typography variant="body1">
-                  Rs. {product.mrp?.toLocaleString()}
-                </Typography>
-              </Box>
-            </Grid>
-          ))}
-        </Grid> */}
-
         {(loading || hasNextPage) && (
           <Grid item alignSelf="center" ref={sentryRef}>
             <CircularProgress fontSize="small" />
@@ -476,4 +420,4 @@ function Category() {
   );
 }
 
-export default Category;
+export default OutOfStock;
