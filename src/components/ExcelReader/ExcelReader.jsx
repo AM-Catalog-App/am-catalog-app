@@ -14,7 +14,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { PRODUCT_DETAIL_EXCEL_COLUMN_NAMES } from "../../constants/constants.js";
 import { capitalizeFirstLetter } from "../../utils/index";
 import Modal from "@mui/material/Modal";
-import { Box, Stack, Typography, Button } from "@mui/material";
+import { Box, Stack, Typography, Button, CircularProgress } from "@mui/material";
 import { bulkUploadProducts } from "../../services/index";
 import ProductImageUploader from "../ProductImageUploader/ProductImageUploader";
 import styles from "./ExcelReader.module.css";
@@ -29,9 +29,13 @@ function ExcelReader() {
   const [selectedProductId, setSelectedProductId] = useState("");
   const [selectedBarCode, setSelectedBarCode] = useState("");
   const [inputKey, setInputKey] = useState(Date.now());
+  const [uploading, setUploading] = useState(false);
+  const [selectedProductImageUrls, setSelectedProductImageUrls] = useState([]);
 
   const findMissingColumns = (columns) => {
-    return PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.filter((col) => !columns.includes(col.toLowerCase()));
+    return PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.filter(
+      (col) => col !== "imageUrls" && !columns.includes(col.toLowerCase())
+    );
   };
 
   const handleFileUpload = (event) => {
@@ -74,7 +78,9 @@ function ExcelReader() {
 
   const handleBulkUpload = async () => {
     try {
+      setUploading(true);
       const response = await bulkUploadProducts(tableData);
+      setUploading(false);
       setUploadResponse(response);
       setIsModalOpen(true);
       toast.success("Products processed");
@@ -148,7 +154,12 @@ function ExcelReader() {
           onClick={handleBulkUpload}
           className={styles.UploadButton}
         >
-          Upload
+          <Stack direction="row" alignItemst="center" justifyContent="center" spacing={2}>
+            <Typography variant="body1" color="initial" className={styles.UploadText}>
+              Upload
+            </Typography>
+            {uploading && <CircularProgress className={styles.CircularProgress} />}
+          </Stack>
         </Button>
       </Stack>
       <TableContainer component={Paper}>
@@ -157,16 +168,21 @@ function ExcelReader() {
             <TableRow>
               {PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.map(
                 (header, index) =>
-                  header !== "Image" && (
+                  header.toLowerCase() !== "imageurls" && (
                     <TableCell key={index}>
                       <Typography variant="h6" color="initial" className={styles.ColumnTitle}>
-                        {" "}
                         {capitalizeFirstLetter(header)}
                       </Typography>
                     </TableCell>
                   )
               )}
-              {showUploadImageColumn && <TableCell>Upload Image</TableCell>}
+              {showUploadImageColumn && (
+                <TableCell>
+                  <Typography variant="h6" color="initial" className={styles.ColumnTitle}>
+                    Upload Image
+                  </Typography>
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -174,7 +190,7 @@ function ExcelReader() {
               tableData.map((row, rowIndex) => (
                 <TableRow key={rowIndex}>
                   {PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.map((header, colIndex) => {
-                    if (header !== "Image") {
+                    if (header.toLowerCase() !== "imageurls") {
                       if (header === "sr no.") {
                         return <TableCell key={colIndex}>{rowIndex + 1}</TableCell>;
                       }
@@ -193,18 +209,36 @@ function ExcelReader() {
                   })}
                   {showUploadImageColumn && (
                     <TableCell>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => {
-                          setIsProductImageUploaderOpen(true);
-                          setSelectedProductId(row._id);
-                          setSelectedBarCode(row.barcode);
-                        }}
-                        className={styles.UploadButton}
-                      >
-                        Upload
-                      </Button>
+                      <Stack direction="row" spacing={2}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => {
+                            setIsProductImageUploaderOpen(true);
+                            setSelectedProductId(row._id);
+                            setSelectedBarCode(row.barcode);
+                            setSelectedProductImageUrls(row.imageUrls);
+                          }}
+                          className={styles.UploadButton}
+                        >
+                          Upload
+                        </Button>
+                        {row.imageUrls.length > 0 && (
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => {
+                              setIsProductImageUploaderOpen(true);
+                              setSelectedProductId(row._id);
+                              setSelectedBarCode(row.barcode);
+                              setSelectedProductImageUrls(row.imageUrls);
+                            }}
+                            className={styles.ViewButton}
+                          >
+                            View
+                          </Button>
+                        )}
+                      </Stack>
                     </TableCell>
                   )}
                 </TableRow>
@@ -222,6 +256,17 @@ function ExcelReader() {
           barcode={selectedBarCode}
           open={isProductImageUploaderOpen}
           onClose={() => setIsProductImageUploaderOpen(false)}
+          imageUrls={selectedProductImageUrls}
+          onSuccessfulUpload={(imageUrls) => {
+            const tableDataClone = JSON.parse(JSON.stringify(tableData));
+            for (let index = 0; index < tableDataClone.length; index++) {
+              if (tableDataClone[index]['_id'] === selectedProductId) {
+                tableDataClone[index]['imageUrls'] = imageUrls;
+                break;
+              }
+            }
+            setTableData(tableDataClone);
+          }}
         />
       )}
     </Stack>

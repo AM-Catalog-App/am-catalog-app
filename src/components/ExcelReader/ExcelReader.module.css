@@ -22,7 +22,26 @@
     background-color: #90af93 !important;
     font-weight: bold !important;
 }
+.UploadButton:hover {
+    background-color: #6aa26e !important;
+}
+.ViewButton {
+    background-color: #004785 !important;
+    font-weight: bold !important;
+}
+.UploadButton:hover {
+    background-color: #1379d2 !important;
+}
 .ColumnTitle {
     font-size: 16px !important;
     font-weight: 600 !important;
+}
+.UploadText {
+    font-weight: 600 !important;
+    color: white !important;
+}
+.CircularProgress {
+    width: 20px !important;
+    height: 20px !important;
+    color: white !important;
 }

@@ -1,27 +1,28 @@
 import PropTypes from "prop-types";
 import Carousel from "react-material-ui-carousel";
-import { Paper } from "@mui/material";
 import NoProductImage from "../../../assets/NoProductImage.png";
 
 function ImageSlider({ images }) {
   if (images.length === 0) {
-    return <img src={NoProductImage} alt="No Images" style={{ width: "100%", height: "auto" }} />;
+    return <img src={NoProductImage} alt="No Images" />;
   }
 
   return (
-    <Carousel animation="slide" indicators={true}>
+    <Carousel
+      animation="slide"
+      indicators={true}
+    >
       {images.map((imageOrComponent, index) => (
-        <Paper key={index} sx={{ width: "100%", boxShadow: "none" }}>
+        <>
           {typeof imageOrComponent === "string" ? (
             <img
               src={imageOrComponent}
               alt={`Slide ${index}`}
-              style={{ width: "auto", height: "auto" }}
             />
           ) : (
             imageOrComponent
           )}
-        </Paper>
+        </>
       ))}
     </Carousel>
   );

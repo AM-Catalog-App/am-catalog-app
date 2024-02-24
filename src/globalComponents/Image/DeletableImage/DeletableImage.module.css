@@ -1,20 +1,14 @@
-.imageContainer {
-    position: relative;
-    display: inline-block;
-  }
-  
-.image {
-    width: 100%;
-    height: auto;
+.DeletableImage {
+    padding: 14px;
 }
-
 .deleteButton {
-    position: absolute;
-    right: 0;
-    top: 0;
-    color: rgba(255, 255, 255, 0.7);
-    background-color: rgba(0, 0, 0, 0.4);
-    margin: 4px;
-    border-radius: 50%;
+    position: absolute !important;
+    right: 0 !important;
+    top: 0 !important;
+    color: rgba(255, 255, 255, 1) !important;
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    transform: translate(-2px, 2px);
+    border-radius: 50% !important;
+    padding: 5px !important;
 }
   
