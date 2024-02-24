@@ -17,7 +17,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import useInfiniteScroll from "react-infinite-scroll-hook";
 import {
   getBestsellers,
@@ -167,7 +167,9 @@ function FilterMenu({
 }
 
 function Category() {
-  const { categoryName } = useParams();
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const categoryName = query.get('name');
   const navigate = useNavigate();
   const displayCategoryName =
     categoryName[0].charAt(0).toUpperCase() +
