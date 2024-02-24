@@ -1,0 +1,46 @@
+.ProductDetailPage {
+    width: 100%;
+    background-color: white;
+}
+
+.ProductDetails {
+    padding: 12px;
+}
+  
+.ProductImages img {
+    height: 500px;
+    width: auto;
+    object-fit: cover;
+}
+
+.ProductDetailsHeading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px; 
+}
+
+.ProductName {
+    font-weight: bold !important;
+    text-wrap: true;
+}
+
+.ProductDetailsSubHeading {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px; 
+}
+
+.ProductMRP {
+    color: #4A8A62 !important;
+}
+
+.RelatedProducts {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.Colours .MuiChip-root {
+    margin-right: 8px; 
+}
