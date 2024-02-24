@@ -20,7 +20,7 @@ function Catalog() {
   };
 
   const handleClick = (name) => {
-    navigate(`/category/${name}`);
+    navigate(`/category?name=${name}`);
   };
 
   useEffect(() => {
