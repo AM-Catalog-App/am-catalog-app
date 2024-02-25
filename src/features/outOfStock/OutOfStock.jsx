@@ -4,6 +4,7 @@ import {
   Grid,
   Box,
   CircularProgress,
+  Stack,
   Chip,
   TextField,
   InputAdornment,
@@ -19,7 +20,7 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useInfiniteScroll from "react-infinite-scroll-hook";
-import { getOutOfStockProducts } from "../../services/catalog";
+import { getOutOfStockProducts, getFilters } from "../../services/catalog";
 import useIsMobile from "../../utils/useIsMobile";
 import AppLayout from "../../components/AppLayout/AppLayout";
 import colors from "../../styles/colors";
@@ -29,6 +30,37 @@ import { ExpandMore } from "@mui/icons-material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useTheme } from "@mui/material/styles";
 import amLogo from "../../assets/amLogo1.png";
+import { capitalizeFirstLetter } from "../../utils";
+
+const DebouncedTextField = ({ onChange, ...rest }) => {
+  const [value, setValue] = useState("");
+
+  const handleChange = (event) => {
+    const newValue = event.target.value;
+    setValue(newValue);
+    onChange(newValue);
+  };
+
+  return (
+    <TextField
+      {...rest}
+      value={value}
+      onChange={handleChange}
+      variant="outlined"
+      InputProps={{
+        sx: { borderRadius: "20px", border: colors.green },
+
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton>
+              <SearchIcon />
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
+    />
+  );
+};
 
 const circleStyle = {
   display: "flex",
@@ -61,13 +93,27 @@ function FilterMenu({
     setAnchorEl(null);
   };
   const handleLocationSelect = (location) => {
-    setSelectedLocations((prevState) => [...prevState, location]);
-    // handleClose();
+    setSelectedLocations((prevState) => {
+      // If the location is already selected, remove it
+      if (prevState.includes(location)) {
+        return prevState.filter((loc) => loc !== location);
+      } else {
+        // Otherwise, add it to the selected locations
+        return [...prevState, location];
+      }
+    });
   };
 
   const handleColourSelect = (colour) => {
-    setSelectedColours((prevState) => [...prevState, colour]);
-    // handleClose();
+    setSelectedColours((prevState) => {
+      // If the colour is already selected, remove it
+      if (prevState.includes(colour)) {
+        return prevState.filter((col) => col !== colour);
+      } else {
+        // Otherwise, add it to the selected colours
+        return [...prevState, colour];
+      }
+    });
   };
 
   return (
@@ -79,95 +125,98 @@ function FilterMenu({
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleFilterClose}
-        p={5}
-        sx={{ padding: "20px" }}
+        sx={{ borderRadius: "50px", width: "300px" }}
       >
-        {/* {Object.entries(filters).map(([category, values]) => (
-          <MenuItem key={category}>
-            <Typography variant="h6">{category}</Typography>
-            {category === "location" && (
-              <Menu
-                anchorReference="anchorEl"
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleFilterClose}
-              >
-                {values.map((location) => (
-                  <MenuItem
-                    key={location._id}
-                    onClick={() => handleLocationSelect(location)}
-                    selected={selectedLocations?.includes(location.name)}
-                  >
-                    <Typography variant="body2">{location.name}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            )}
-            {category === "colour" && (
-              <Menu
-                anchorReference="anchorEl"
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleFilterClose}
-              >
-                {values.map((colour) => (
-                  <MenuItem
-                    key={colour._id}
-                    onClick={() => handleColourSelect(colour)}
-                    selected={selectedColours?.includes(colour.name)}
-                  >
-                    <Typography variant="body2"> {colour.name}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            )}
-          </MenuItem>
-        ))} */}
-
-        {Object.entries(filters).map(([category, values]) => (
-          <Accordion sx={{ padding: "10px" }} key={category}>
-            <AccordionSummary expandIcon={<ExpandMore />}>
-              {category}
-            </AccordionSummary>
-            <AccordionDetails>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                {values.map((value) => (
-                  <FormControlLabel
-                    key={value._id}
-                    control={
-                      <Checkbox
-                        checked={
-                          category === "location"
-                            ? selectedLocations?.includes(value.name)
-                            : selectedColours?.includes(value.name)
-                        }
-                        onChange={() => {
-                          if (category === "location") {
-                            handleLocationSelect(value?.name);
-                          } else {
-                            handleColourSelect(value?.name);
+        {/* <Stack p={2}>
+          <Typography variant="h6">Filters</Typography>
+          {Object.entries(filters).map(([category, values]) => (
+            <Accordion sx={{ padding: "10px" }} key={category}>
+              <AccordionSummary expandIcon={<ExpandMore />}>
+                {category}
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack>
+                  {values.map((value) => (
+                    <FormControlLabel
+                      key={value._id}
+                      control={
+                        <Checkbox
+                          checked={
+                            category === "location"
+                              ? selectedLocations?.includes(value.name)
+                              : selectedColours?.includes(value.name)
                           }
-                        }}
-                      />
-                    }
-                    label={value.name}
-                  />
-                ))}
-              </div>
-            </AccordionDetails>
-          </Accordion>
-        ))}
+                          onChange={() => {
+                            if (category === "location") {
+                              handleLocationSelect(value?.name);
+                            } else {
+                              handleColourSelect(value?.name);
+                            }
+                          }}
+                        />
+                      }
+                      label={value.name}
+                    />
+                  ))}
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+          ))}
+        </Stack> */}
+        <Stack>
+          <Typography sx={{ pl: 3 }} variant="h5">
+            Filters
+          </Typography>
+          {Object.entries(filters).map(([category, values]) => (
+            <Accordion key={category} sx={{ boxShadow: 0 }}>
+              <AccordionSummary
+                expandIcon={<ExpandMore />}
+                sx={{ flexDirection: "row-reverse", pl: 2 }} // Move expand icon to the left
+              >
+                <Typography variant="h6">
+                  {capitalizeFirstLetter(category)}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ backgroundColor: colors.light2 }}>
+                <Stack>
+                  {values.map((value) => (
+                    <FormControlLabel
+                      key={value._id}
+                      control={
+                        <Checkbox
+                          checked={
+                            category === "location"
+                              ? selectedLocations?.includes(value.name)
+                              : selectedColours?.includes(value.name)
+                          }
+                          onChange={() => {
+                            if (category === "location") {
+                              handleLocationSelect(value?.name);
+                            } else {
+                              handleColourSelect(value?.name);
+                            }
+                          }}
+                        />
+                      }
+                      label={
+                        <Typography variant="body1" noWrap>
+                          {value.name}
+                        </Typography>
+                      }
+                    />
+                  ))}
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+          ))}
+        </Stack>
       </Menu>
     </>
   );
 }
 
 function OutOfStock() {
-  //   const { categoryName } = useParams();
   const navigate = useNavigate();
-  //   const displayCategoryName =
-  //     categoryName[0].charAt(0).toUpperCase() +
-  //     categoryName.slice(1).toLowerCase();
   const isMobile = useIsMobile();
   const [bestsellers, setBestsellers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -185,17 +234,17 @@ function OutOfStock() {
   };
 
   useEffect(() => {
-    //   fetchFilters();
+    fetchFilters();
     //   fetchBestsellers();
     loadMoreProducts(true);
     return () => {};
   }, []);
 
-  //   useEffect(() => {
-  //     loadMoreProducts(true);
-  //   }, [selectedColours, selectedLocations]);
+  useEffect(() => {
+    loadMoreProducts(true);
+  }, [selectedColours, selectedLocations]);
 
-  const loadMoreProducts = async (reset = "false") => {
+  const loadMoreProducts = async (reset = "false", tempSearch = search) => {
     try {
       setLoading(true);
       let startIndex = reset ? 0 : products?.length,
@@ -207,7 +256,7 @@ function OutOfStock() {
           endIndex,
           colour: selectedColours,
           location: selectedLocations,
-          search,
+          search: tempSearch,
         });
       if (total !== totalProducts) setTotalProducts(total);
       if (reset === true) {
@@ -232,21 +281,30 @@ function OutOfStock() {
       setFilters([]);
     }
   };
-
-  const truncateProductName = (name, maxLength) => {
-    return name.length > maxLength
-      ? name.substring(0, maxLength - 3) + "..."
-      : name;
+  const debounce = (func, delay) => {
+    let timerId;
+    return function (...args) {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+      timerId = setTimeout(() => {
+        func.apply(this, args);
+      }, delay);
+    };
+  };
+  const handleSearchChange = (e) => {
+    const tempSearch = e;
+    setSearch(e);
+    loadMoreProducts(true, tempSearch);
   };
 
-  const fetchBestsellers = async () => {
-    try {
-      const tempBestellers = await getBestsellers(categoryName);
-      setBestsellers(tempBestellers);
-    } catch (err) {
-      setBestsellers([]);
-    }
-  };
+  const DebouncedSearch = debounce(handleSearchChange, 500); // 500 ms is the current delay
+
+  // const truncateProductName = (name, maxLength) => {
+  //   return name.length > maxLength
+  //     ? name.substring(0, maxLength - 3) + "..."
+  //     : name;
+  // };
 
   // // const { items error, loadMore } = useLoadItems();
   const [sentryRef, { rootRef }] = useInfiniteScroll({
@@ -257,12 +315,6 @@ function OutOfStock() {
     rootMargin: "0px 0px 400px 0px",
   });
 
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-  };
-  const handleSearchSubmit = () => {
-    loadMoreProducts(true); // resets the current fetched results
-  };
   return (
     <AppLayout>
       <Grid container direction="column" alignItems="center" mt={3} p={2}>
@@ -290,19 +342,13 @@ function OutOfStock() {
         <Grid
           container
           item
-          xs={12}
+          // xs={12}
           mt={3}
           mb={3}
           direction="row"
-          justifyContent="space-evenly"
+          justifyContent="space-between"
           alignItems="center"
         >
-          <Grid item xs={4}>
-            <Typography variant="h5">
-              {/* {totalProducts} {displayCategoryName} */}
-            </Typography>
-          </Grid>
-
           {/* Filter Chip */}
           <Grid item xs={4}>
             <Box sx={{ ...circleStyle }}>
@@ -318,30 +364,41 @@ function OutOfStock() {
 
           {/* Search Chip */}
 
-          <Grid item xs={4}>
+          <Grid item xs={8}>
             {isSearchExpanded ? (
-              <TextField
+              // <TextField
+              //   id="input-with-icon-textfield"
+              //   label={
+              //     <Typography sx={{ fontSize: "0.75rem" }}>
+              //       Search Customs
+              //     </Typography>
+              //   }
+              //   // variant="standard"
+              //   value={search}
+              //   onChange={handleSearchChange}
+              //   fullWidth
+              //   variant="filled"
+              //   size="small"
+              //   InputProps={{
+              //     endAdornment: (
+              //       <InputAdornment position="end">
+              //         <IconButton>
+              //           <SearchIcon />
+              //         </IconButton>
+              //       </InputAdornment>
+              //     ),
+              //   }}
+              // />
+              <DebouncedTextField
                 id="input-with-icon-textfield"
                 label={
                   <Typography sx={{ fontSize: "0.75rem" }}>
                     Search Customs
                   </Typography>
                 }
-                // variant="standard"
-                value={search}
-                onChange={handleSearchChange}
                 fullWidth
-                variant="filled"
                 size="small"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={handleSearchSubmit}>
-                        <SearchIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
+                onChange={DebouncedSearch}
               />
             ) : (
               <Box sx={circleStyle}>
@@ -376,7 +433,7 @@ function OutOfStock() {
                 <Grid item>
                   <img
                     key={product?._id}
-                    src={product?.imageUrls[0]}
+                    src={product?.imageUrl}
                     height={isMobile ? "200px" : "300px"}
                     width={"auto"}
                     onError={(e) => {
@@ -412,7 +469,7 @@ function OutOfStock() {
         )}
         {!(loading || hasNextPage) && (
           <Grid item alignSelf="center" ref={sentryRef}>
-            <Typography variant="h6">No more Products</Typography>
+            <Typography variant="h6">No more Articles</Typography>
           </Grid>
         )}
       </Grid>

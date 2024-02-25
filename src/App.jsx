@@ -21,7 +21,10 @@ function App() {
           <Route path="/excel-reader" element={<ExcelReader />} />
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/category/:categoryName" element={<Category />} />
-          <Route path="/product-detail" element={<ClientProductDetail />} />
+          <Route
+            path="/product-detail/:barCode"
+            element={<ClientProductDetail />}
+          />
           <Route path="/out-of-stock" element={<OutOfStock />} />
         </Routes>
       </Router>

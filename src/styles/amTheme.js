@@ -1,13 +1,14 @@
 
 import { createTheme } from '@mui/material/styles';
+import colors from './colors';
 
 const amTheme = createTheme({
     palette: {
         primary: {
-            main: '#1976D2',
+            main: colors.blue,
         },
         secondary: {
-            main: '#f50057',
+            main: colors.green,
         },
         // Add other palette options as needed
     },

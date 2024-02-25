@@ -13,7 +13,7 @@ const getAllCategories = async () => {
 
 const getBestsellers = async (categoryName) => {
     try {
-        const { data } = await axiosInstance.get(`/catalog/${categoryName}/bestsellers`);
+        const { data } = await axiosInstance.get(`/catalog/bestsellers?category=${categoryName}`);
         // console.log("data", data)
         return data;
     } catch (error) {

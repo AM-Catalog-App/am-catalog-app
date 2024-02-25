@@ -6,6 +6,7 @@ import {
   CircularProgress,
   Chip,
   TextField,
+  Stack,
   InputAdornment,
   AccordionSummary,
   Accordion,
@@ -33,6 +34,37 @@ import { ExpandMore } from "@mui/icons-material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useTheme } from "@mui/material/styles";
 import amLogo from "../../assets/amLogo1.png";
+import { capitalizeFirstLetter } from "../../utils";
+
+const DebouncedTextField = ({ onChange, ...rest }) => {
+  const [value, setValue] = useState("");
+
+  const handleChange = (event) => {
+    const newValue = event.target.value;
+    setValue(newValue);
+    onChange(newValue);
+  };
+
+  return (
+    <TextField
+      {...rest}
+      value={value}
+      onChange={handleChange}
+      variant="outlined"
+      InputProps={{
+        sx: { borderRadius: "20px", border: colors.green },
+
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton>
+              <SearchIcon />
+            </IconButton>
+          </InputAdornment>
+        ),
+      }}
+    />
+  );
+};
 
 const circleStyle = {
   display: "flex",
@@ -65,13 +97,27 @@ function FilterMenu({
     setAnchorEl(null);
   };
   const handleLocationSelect = (location) => {
-    setSelectedLocations((prevState) => [...prevState, location]);
-    // handleClose();
+    setSelectedLocations((prevState) => {
+      // If the location is already selected, remove it
+      if (prevState.includes(location)) {
+        return prevState.filter((loc) => loc !== location);
+      } else {
+        // Otherwise, add it to the selected locations
+        return [...prevState, location];
+      }
+    });
   };
 
   const handleColourSelect = (colour) => {
-    setSelectedColours((prevState) => [...prevState, colour]);
-    // handleClose();
+    setSelectedColours((prevState) => {
+      // If the colour is already selected, remove it
+      if (prevState.includes(colour)) {
+        return prevState.filter((col) => col !== colour);
+      } else {
+        // Otherwise, add it to the selected colours
+        return [...prevState, colour];
+      }
+    });
   };
 
   return (
@@ -83,91 +129,62 @@ function FilterMenu({
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleFilterClose}
-        p={5}
-        sx={{ padding: "20px" }}
+        sx={{ borderRadius: "50px", width: "300px" }}
       >
-        {/* {Object.entries(filters).map(([category, values]) => (
-          <MenuItem key={category}>
-            <Typography variant="h6">{category}</Typography>
-            {category === "location" && (
-              <Menu
-                anchorReference="anchorEl"
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleFilterClose}
+        <Stack>
+          <Typography sx={{ pl: 3 }} variant="h5">
+            Filters
+          </Typography>
+          {Object.entries(filters).map(([category, values]) => (
+            <Accordion key={category} sx={{ boxShadow: 0 }}>
+              <AccordionSummary
+                expandIcon={<ExpandMore />}
+                sx={{ flexDirection: "row-reverse", pl: 2 }} // Move expand icon to the left
               >
-                {values.map((location) => (
-                  <MenuItem
-                    key={location._id}
-                    onClick={() => handleLocationSelect(location)}
-                    selected={selectedLocations?.includes(location.name)}
-                  >
-                    <Typography variant="body2">{location.name}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            )}
-            {category === "colour" && (
-              <Menu
-                anchorReference="anchorEl"
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleFilterClose}
-              >
-                {values.map((colour) => (
-                  <MenuItem
-                    key={colour._id}
-                    onClick={() => handleColourSelect(colour)}
-                    selected={selectedColours?.includes(colour.name)}
-                  >
-                    <Typography variant="body2"> {colour.name}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            )}
-          </MenuItem>
-        ))} */}
-
-        {Object.entries(filters).map(([category, values]) => (
-          <Accordion sx={{ padding: "10px" }} key={category}>
-            <AccordionSummary expandIcon={<ExpandMore />}>
-              {category}
-            </AccordionSummary>
-            <AccordionDetails>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                {values.map((value) => (
-                  <FormControlLabel
-                    key={value._id}
-                    control={
-                      <Checkbox
-                        checked={
-                          category === "location"
-                            ? selectedLocations?.includes(value.name)
-                            : selectedColours?.includes(value.name)
-                        }
-                        onChange={() => {
-                          if (category === "location") {
-                            handleLocationSelect(value?.name);
-                          } else {
-                            handleColourSelect(value?.name);
+                <Typography variant="h6">
+                  {capitalizeFirstLetter(category)}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ backgroundColor: colors.light2 }}>
+                <Stack>
+                  {values.map((value) => (
+                    <FormControlLabel
+                      key={value._id}
+                      control={
+                        <Checkbox
+                          checked={
+                            category === "location"
+                              ? selectedLocations?.includes(value.name)
+                              : selectedColours?.includes(value.name)
                           }
-                        }}
-                      />
-                    }
-                    label={value.name}
-                  />
-                ))}
-              </div>
-            </AccordionDetails>
-          </Accordion>
-        ))}
+                          onChange={() => {
+                            if (category === "location") {
+                              handleLocationSelect(value?.name);
+                            } else {
+                              handleColourSelect(value?.name);
+                            }
+                          }}
+                        />
+                      }
+                      label={
+                        <Typography variant="body2" noWrap>
+                          {value.name}
+                        </Typography>
+                      }
+                    />
+                  ))}
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+          ))}
+        </Stack>
       </Menu>
     </>
   );
 }
-
 function Category() {
-  const { categoryName } = useParams();
+  let { categoryName } = useParams();
+  categoryName = decodeURIComponent(categoryName);
   const navigate = useNavigate();
   const displayCategoryName =
     categoryName[0].charAt(0).toUpperCase() +
@@ -199,7 +216,7 @@ function Category() {
     loadMoreProducts(true);
   }, [selectedColours, selectedLocations]);
 
-  const loadMoreProducts = async (reset = "false") => {
+  const loadMoreProducts = async (reset = "false", tempSearch = search) => {
     try {
       setLoading(true);
       let startIndex = reset ? 0 : products?.length,
@@ -210,7 +227,7 @@ function Category() {
         endIndex,
         colour: selectedColours,
         location: selectedLocations,
-        search,
+        search: tempSearch,
       });
       if (total !== totalProducts) setTotalProducts(total);
       if (reset === true) {
@@ -261,11 +278,29 @@ function Category() {
   });
 
   const handleSearchChange = (e) => {
-    setSearch(e.target.value);
+    const tempSearch = e;
+    setSearch(e);
+    loadMoreProducts(true, tempSearch);
   };
-  const handleSearchSubmit = () => {
-    loadMoreProducts(true); // resets the current fetched results
+
+  const debounce = (func, delay) => {
+    let timerId;
+    return function (...args) {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+      timerId = setTimeout(() => {
+        func.apply(this, args);
+      }, delay);
+    };
   };
+  const handleProductClick = (barCode) => {
+    const encodedBarCode = encodeURIComponent(barCode);
+    navigate(`/product-detail/${encodedBarCode}`);
+  };
+
+  const DebouncedSearch = debounce(handleSearchChange, 500); // 500 ms is the current delay
+
   return (
     <AppLayout>
       <Grid container direction="column" alignItems="center" mt={3} p={2}>
@@ -320,7 +355,7 @@ function Category() {
           </Grid>
 
           {/* Filter Chip */}
-          <Grid item xs={4}>
+          <Grid container item xs={8} justifyContent="flex-end" columnGap={1}>
             <Box sx={{ ...circleStyle }}>
               <FilterMenu
                 filters={filters}
@@ -329,40 +364,8 @@ function Category() {
                 setSelectedLocations={setSelectedLocations}
                 setSelectedColours={setSelectedColours}
               />
-              {/* <IconButton onClick={handleFilterClick} sx={iconStyle}>
-                <FilterListIcon />
-              </IconButton> */}
             </Box>
-          </Grid>
-
-          {/* Search Chip */}
-
-          <Grid item xs={4}>
-            {isSearchExpanded ? (
-              <TextField
-                id="input-with-icon-textfield"
-                label={
-                  <Typography sx={{ fontSize: "0.75rem" }}>
-                    Search {displayCategoryName}
-                  </Typography>
-                }
-                // variant="standard"
-                value={search}
-                onChange={handleSearchChange}
-                fullWidth
-                variant="filled"
-                size="small"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={handleSearchSubmit}>
-                        <SearchIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            ) : (
+            {isSearchExpanded === false && (
               <Box sx={circleStyle}>
                 <IconButton onClick={handleSearchClick} sx={iconStyle}>
                   <SearchIcon />
@@ -370,6 +373,27 @@ function Category() {
               </Box>
             )}
           </Grid>
+
+          {/* Search Chip */}
+
+          {/* <Grid item xs={4}>
+            
+          </Grid> */}
+        </Grid>
+        <Grid item xs={12}>
+          {isSearchExpanded && (
+            <DebouncedTextField
+              id="input-with-icon-textfield"
+              label={
+                <Typography sx={{ fontSize: "0.75rem" }}>
+                  Search {displayCategoryName}
+                </Typography>
+              }
+              fullWidth
+              size="small"
+              onChange={DebouncedSearch}
+            />
+          )}
         </Grid>
         <Grid
           item
@@ -392,7 +416,12 @@ function Category() {
                 p={2}
                 alignItems="center"
               >
-                <Grid item onClick={()=>[navigate("/product-detail")]}>
+                <Grid
+                  item
+                  onClick={() => {
+                    handleProductClick(product?.barcode); 
+                  }}
+                >
                   <img
                     key={product?._id}
                     src={product?.imageUrl}
@@ -468,7 +497,7 @@ function Category() {
         )}
         {!(loading || hasNextPage) && (
           <Grid item alignSelf="center" ref={sentryRef}>
-            <Typography variant="h6">No more Products</Typography>
+            <Typography variant="h6">No more Articles</Typography>
           </Grid>
         )}
       </Grid>

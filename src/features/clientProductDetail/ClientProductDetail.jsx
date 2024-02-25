@@ -3,14 +3,17 @@ import { getProductDetails } from "../../services/product";
 import AppLayout from "../../components/AppLayout/AppLayout";
 import { Box, Typography, IconButton } from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
-import Chip from '@mui/material/Chip';
+import Chip from "@mui/material/Chip";
+import { useParams } from "react-router-dom";
 
 export default function ClientProductDetail() {
   const [productDetails, setProductDetails] = useState(null);
-
+  const { barCode } = useParams();
   const fetchProductDetails = async () => {
     try {
-      const productDetails = await getProductDetails("AM/48425");
+      const productDetails = await getProductDetails(
+        decodeURIComponent(barCode)
+      );
       setProductDetails(productDetails);
     } catch (err) {
       console.error(err);
@@ -25,9 +28,7 @@ export default function ClientProductDetail() {
     <AppLayout>
       {productDetails?.productName ? (
         <Box>
-          <Box className="ProductImages">
-            
-          </Box>
+          <Box className="ProductImages"></Box>
           <Box className="ProductDetails">
             <Box className="ProductDetailsHeading">
               <Typography variant="h2" color="initial">
@@ -55,18 +56,23 @@ export default function ClientProductDetail() {
             </Typography>
             <Box className="RelatedProducts">
               <Box className="Colours">
-                {
-                  productDetails.colours.map((productColour) => {
-                    return <Chip key={productColour.key} sx={{
-                      backgroundColor: `${productColour.colourHexcode}`
-                    }} />
-                  } )
-                }
+                {productDetails.colours.map((productColour) => {
+                  return (
+                    <Chip
+                      key={productColour.key}
+                      sx={{
+                        backgroundColor: `${productColour.colourHexcode}`,
+                      }}
+                    />
+                  );
+                })}
               </Box>
               <Box className="Sizes"></Box>
             </Box>
             <Box className="ProductDescription">
-              <Typography variant="body1" color="initial">{productDetails.description}</Typography>
+              <Typography variant="body1" color="initial">
+                {productDetails.description}
+              </Typography>
             </Box>
           </Box>
         </Box>
