@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getProductDetails } from "../../services/product";
 import AppLayout from "../../components/AppLayout/AppLayout";
-import { Box, Typography, IconButton } from "@mui/material";
+import { Box, Typography, IconButton, CircularProgress } from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import Chip from "@mui/material/Chip";
 import ImageSlider from "../../globalComponents/Image/ImageSlider/ImageSlider";
@@ -27,6 +27,18 @@ export default function ClientProductDetail() {
     fetchProductDetails();
   }, []);
 
+  const handleShareButtonClick = () => {
+    const currentURL = window.location.href;
+    navigator.clipboard
+      .writeText(currentURL)
+      .then(() => {
+        alert("Link copied to clipboard!");
+      })
+      .catch((error) => {
+        console.error("Failed to copy link: ", error);
+      });
+  };
+
   return (
     <AppLayout>
       {productDetails?.productName ? (
@@ -40,14 +52,16 @@ export default function ClientProductDetail() {
           </Box>
           <Box className={styles.ProductDetails}>
             <Box className={styles.ProductDetailsHeading}>
-              <Typography className={styles.ProductName} variant="h6" color="initial">
+              <Typography
+                className={styles.ProductName}
+                variant="h6"
+                color="initial"
+              >
                 {productDetails.productName}
               </Typography>
               <IconButton
                 aria-label="Share Button"
-                onClick={() => {
-                  console.log("Share button clicked");
-                }}
+                onClick={handleShareButtonClick}
               >
                 <ShareIcon />
               </IconButton>
@@ -60,12 +74,20 @@ export default function ClientProductDetail() {
                 {productDetails.barcode}
               </Typography>
             </Box>
-            <Typography className={styles.ProductMRP} variant="h4" color="initial">
+            <Typography
+              className={styles.ProductMRP}
+              variant="h4"
+              color="initial"
+            >
               Rs {productDetails.mrp}
             </Typography>
             <Box className={styles.RelatedProducts}>
               <Box className={styles.Colours}>
-                <Typography variant="body2" color="initial" sx={{ marginBottom: "4px" }}>
+                <Typography
+                  variant="body2"
+                  color="initial"
+                  sx={{ marginBottom: "4px" }}
+                >
                   Colours
                 </Typography>
                 {productDetails.colours.map((productColour, index) => {
@@ -77,14 +99,21 @@ export default function ClientProductDetail() {
                         borderRadius: "50%",
                         width: "30px",
                         height: "30px",
-                        marginRight: index !== productDetails.colours.length - 1 ? "4px" : "0",
+                        marginRight:
+                          index !== productDetails.colours.length - 1
+                            ? "4px"
+                            : "0",
                       }}
                     />
                   );
                 })}
               </Box>
               <Box className={styles.Sizes}>
-                <Typography variant="body2" color="initial" sx={{ marginBottom: "4px" }}>
+                <Typography
+                  variant="body2"
+                  color="initial"
+                  sx={{ marginBottom: "4px" }}
+                >
                   Sizes
                 </Typography>
                 {productDetails.sizes.map((productSize, index) => {
@@ -97,7 +126,10 @@ export default function ClientProductDetail() {
                         backgroundColor: "white",
                         border: "1px solid grey",
                         borderRadius: "20%",
-                        marginRight: index !== productDetails.sizes.length - 1 ? "4px" : "0",
+                        marginRight:
+                          index !== productDetails.sizes.length - 1
+                            ? "4px"
+                            : "0",
                       }}
                     />
                   );
@@ -119,7 +151,9 @@ export default function ClientProductDetail() {
           </Box>
         </Box>
       ) : (
-        <Box>Oops! Something went wrong</Box>
+        <Box>
+          <CircularProgress />
+        </Box>
       )}
     </AppLayout>
   );
