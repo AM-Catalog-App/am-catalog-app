@@ -133,7 +133,7 @@ function FilterMenu({
         sx={{ borderRadius: "50px", width: "300px" }}
       >
         <Stack>
-          <Typography sx={{ pl: 3 }} variant="h5">
+          <Typography sx={{ pl: 3 }} variant="h6">
             Filters
           </Typography>
           {Object.entries(filters).map(([category, values]) => (
@@ -142,11 +142,11 @@ function FilterMenu({
                 expandIcon={<ExpandMore />}
                 sx={{ flexDirection: "row-reverse", pl: 2 }} // Move expand icon to the left
               >
-                <Typography variant="h6">
+                <Typography variant="body1">
                   {capitalizeFirstLetter(category)}
                 </Typography>
               </AccordionSummary>
-              <AccordionDetails sx={{ backgroundColor: colors.light2 }}>
+              <AccordionDetails sx={{ backgroundColor: colors.light1 }}>
                 <Stack>
                   {values.map((value) => (
                     <FormControlLabel
@@ -217,27 +217,27 @@ function Category() {
     loadMoreProducts(true);
   }, [selectedColours, selectedLocations]);
 
-  const loadMoreProducts = async (reset = "false", tempSearch = search) => {
+  const loadMoreProducts = async (reset = false, tempSearch = search) => {
     try {
       setLoading(true);
-      let startIndex = reset ? 0 : products?.length,
-        endIndex = reset ? 10 : products?.length + 10;
+      let startIndex = reset ? 0 : products?.length;
       const { total, products: tempProducts } = await getProducts({
         category: categoryName,
         startIndex,
-        endIndex,
+        endIndex: startIndex + 10,
         colour: selectedColours,
         location: selectedLocations,
         search: tempSearch,
       });
-      if (total !== totalProducts) setTotalProducts(total);
-      if (reset === true) {
+
+      if (reset) {
         setProducts([...tempProducts]);
       } else {
-        setProducts([...products, ...tempProducts]);
+        setProducts((prevProducts) => [...prevProducts, ...tempProducts]);
       }
-      if (tempProducts?.length < 10) setHasNextPage(false);
 
+      setTotalProducts(total);
+      setHasNextPage(tempProducts?.length >= 10); // Update hasNextPage based on fetched items
       setLoading(false);
     } catch (err) {
       setProducts([]);
@@ -350,7 +350,7 @@ function Category() {
           alignItems="center"
         >
           <Grid item xs={4}>
-            <Typography variant="h5">
+            <Typography variant="h6">
               {totalProducts} {displayCategoryName}
             </Typography>
           </Grid>
@@ -408,7 +408,6 @@ function Category() {
           {products?.map((product) => (
             <>
               <Grid
-                container
                 item
                 direction="column"
                 xs={6}
@@ -417,28 +416,35 @@ function Category() {
                 p={2}
                 alignItems="center"
               >
-                <Grid
-                  item
+                <Stack
                   onClick={() => {
                     handleProductClick(product?.barcode);
                   }}
+                  direction="column"
+                  justifyContent="flex-end"
                 >
-                  <img
-                    key={product?._id}
-                    src={product?.imageUrl}
-                    height={isMobile ? "200px" : "300px"}
-                    width={"auto"}
-                    onError={(e) => {
-                      e.target.src = amLogo; // Set backup image source when the original image fails to load
+                  <Stack
+                    sx={{
+                      minHeight: "300px",
                     }}
-                    style={{
-                      maxWidth: "100%", // Set maximum width to maintain aspect ratio
-                      height: "auto", // Automatically adjust height to maintain aspect ratio
-                    }}
-                    loading="lazy"
-                    alt={"Anju Modi"}
-                  />
-
+                    justifyContent="center"
+                  >
+                    <img
+                      key={product?._id}
+                      src={product?.imageUrl || amLogo}
+                      height={isMobile ? "200px" : "300px"}
+                      width={"auto"}
+                      onError={(e) => {
+                        e.target.src = amLogo; // Set backup image source when the original image fails to load
+                      }}
+                      style={{
+                        maxWidth: "100%", // Set maximum width to maintain aspect ratio
+                        height: "auto", // Automatically adjust height to maintain aspect ratio
+                      }}
+                      loading="lazy"
+                      alt={"Anju Modi"}
+                    />
+                  </Stack>
                   <Typography variant="body2" textAlign="left">
                     {product?.productName}
                   </Typography>
@@ -448,48 +454,11 @@ function Category() {
                   <Typography sx={{ color: colors.green }} variant="body1">
                     Rs. {product?.mrp?.toLocaleString()}
                   </Typography>
-                </Grid>
+                </Stack>
               </Grid>
             </>
           ))}
         </Grid>
-
-        {/* <Grid container direction="row" spacing={2} mb={3}>
-          {products.map((product) => (
-            <Grid item xs={6} md={3} key={product._id}>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <img
-                  src={product.imageUrl}
-                  alt={product._id}
-                  style={{ marginBottom: "8px" }}
-                />
-                <Typography
-                  variant="body1"
-                  textAlign="center"
-                  sx={{
-                    maxWidth: "100%",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {product.productName}
-                </Typography>
-                <Typography variant="body1">
-                  Style Code - {product.styleCode}
-                </Typography>
-                <Typography variant="body1">
-                  Rs. {product.mrp?.toLocaleString()}
-                </Typography>
-              </Box>
-            </Grid>
-          ))}
-        </Grid> */}
 
         {(loading || hasNextPage) && (
           <Grid item alignSelf="center" ref={sentryRef}>

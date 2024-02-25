@@ -164,7 +164,7 @@ function FilterMenu({
           ))}
         </Stack> */}
         <Stack>
-          <Typography sx={{ pl: 3 }} variant="h5">
+          <Typography sx={{ pl: 3 }} variant="h6">
             Filters
           </Typography>
           {Object.entries(filters).map(([category, values]) => (
@@ -173,11 +173,11 @@ function FilterMenu({
                 expandIcon={<ExpandMore />}
                 sx={{ flexDirection: "row-reverse", pl: 2 }} // Move expand icon to the left
               >
-                <Typography variant="h6">
+                <Typography variant="body1">
                   {capitalizeFirstLetter(category)}
                 </Typography>
               </AccordionSummary>
-              <AccordionDetails sx={{ backgroundColor: colors.light2 }}>
+              <AccordionDetails sx={{ backgroundColor: colors.light1 }}>
                 <Stack>
                   {values.map((value) => (
                     <FormControlLabel
@@ -199,7 +199,7 @@ function FilterMenu({
                         />
                       }
                       label={
-                        <Typography variant="body1" noWrap>
+                        <Typography variant="body2" noWrap>
                           {value.name}
                         </Typography>
                       }
