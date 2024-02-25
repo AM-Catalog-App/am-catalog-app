@@ -4,9 +4,9 @@ import {
   Grid,
   Box,
   CircularProgress,
+  Stack,
   Chip,
   TextField,
-  Stack,
   InputAdornment,
   AccordionSummary,
   Accordion,
@@ -18,17 +18,13 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useInfiniteScroll from "react-infinite-scroll-hook";
-import {
-  getBestsellers,
-  getProducts,
-  getFilters,
-} from "../../services/catalog";
+import { getOutOfStockProducts, getFilters } from "../../services/catalog";
 import useIsMobile from "../../utils/useIsMobile";
 import AppLayout from "../../components/AppLayout/AppLayout";
 import colors from "../../styles/colors";
-import classes from "./category.module.css";
+// import classes from "./category.module.css";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { ExpandMore } from "@mui/icons-material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -131,6 +127,42 @@ function FilterMenu({
         onClose={handleFilterClose}
         sx={{ borderRadius: "50px", width: "300px" }}
       >
+        {/* <Stack p={2}>
+          <Typography variant="h6">Filters</Typography>
+          {Object.entries(filters).map(([category, values]) => (
+            <Accordion sx={{ padding: "10px" }} key={category}>
+              <AccordionSummary expandIcon={<ExpandMore />}>
+                {category}
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack>
+                  {values.map((value) => (
+                    <FormControlLabel
+                      key={value._id}
+                      control={
+                        <Checkbox
+                          checked={
+                            category === "location"
+                              ? selectedLocations?.includes(value.name)
+                              : selectedColours?.includes(value.name)
+                          }
+                          onChange={() => {
+                            if (category === "location") {
+                              handleLocationSelect(value?.name);
+                            } else {
+                              handleColourSelect(value?.name);
+                            }
+                          }}
+                        />
+                      }
+                      label={value.name}
+                    />
+                  ))}
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+          ))}
+        </Stack> */}
         <Stack>
           <Typography sx={{ pl: 3 }} variant="h5">
             Filters
@@ -167,7 +199,7 @@ function FilterMenu({
                         />
                       }
                       label={
-                        <Typography variant="body2" noWrap>
+                        <Typography variant="body1" noWrap>
                           {value.name}
                         </Typography>
                       }
@@ -182,13 +214,9 @@ function FilterMenu({
     </>
   );
 }
-function Category() {
-  let { categoryName } = useParams();
-  categoryName = decodeURIComponent(categoryName);
+
+function OutOfStock() {
   const navigate = useNavigate();
-  const displayCategoryName =
-    categoryName[0].charAt(0).toUpperCase() +
-    categoryName.slice(1).toLowerCase();
   const isMobile = useIsMobile();
   const [bestsellers, setBestsellers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -207,8 +235,8 @@ function Category() {
 
   useEffect(() => {
     fetchFilters();
-    fetchBestsellers();
-    loadMoreProducts();
+    //   fetchBestsellers();
+    loadMoreProducts(true);
     return () => {};
   }, []);
 
@@ -221,14 +249,15 @@ function Category() {
       setLoading(true);
       let startIndex = reset ? 0 : products?.length,
         endIndex = reset ? 10 : products?.length + 10;
-      const { total, products: tempProducts } = await getProducts({
-        category: categoryName,
-        startIndex,
-        endIndex,
-        colour: selectedColours,
-        location: selectedLocations,
-        search: tempSearch,
-      });
+      const { total, outOfStockProducts: tempProducts } =
+        await getOutOfStockProducts({
+          category: "",
+          startIndex,
+          endIndex,
+          colour: selectedColours,
+          location: selectedLocations,
+          search: tempSearch,
+        });
       if (total !== totalProducts) setTotalProducts(total);
       if (reset === true) {
         setProducts([...tempProducts]);
@@ -252,37 +281,6 @@ function Category() {
       setFilters([]);
     }
   };
-
-  const truncateProductName = (name, maxLength) => {
-    return name.length > maxLength
-      ? name.substring(0, maxLength - 3) + "..."
-      : name;
-  };
-
-  const fetchBestsellers = async () => {
-    try {
-      const tempBestellers = await getBestsellers(categoryName);
-      setBestsellers(tempBestellers);
-    } catch (err) {
-      setBestsellers([]);
-    }
-  };
-
-  // // const { items error, loadMore } = useLoadItems();
-  const [sentryRef, { rootRef }] = useInfiniteScroll({
-    loading,
-    hasNextPage,
-    onLoadMore: loadMoreProducts,
-    // disabled: !!error,
-    rootMargin: "0px 0px 400px 0px",
-  });
-
-  const handleSearchChange = (e) => {
-    const tempSearch = e;
-    setSearch(e);
-    loadMoreProducts(true, tempSearch);
-  };
-
   const debounce = (func, delay) => {
     let timerId;
     return function (...args) {
@@ -294,12 +292,28 @@ function Category() {
       }, delay);
     };
   };
-  const handleProductClick = (barCode) => {
-    const encodedBarCode = encodeURIComponent(barCode);
-    navigate(`/product-detail/${encodedBarCode}`);
+  const handleSearchChange = (e) => {
+    const tempSearch = e;
+    setSearch(e);
+    loadMoreProducts(true, tempSearch);
   };
 
   const DebouncedSearch = debounce(handleSearchChange, 500); // 500 ms is the current delay
+
+  // const truncateProductName = (name, maxLength) => {
+  //   return name.length > maxLength
+  //     ? name.substring(0, maxLength - 3) + "..."
+  //     : name;
+  // };
+
+  // // const { items error, loadMore } = useLoadItems();
+  const [sentryRef, { rootRef }] = useInfiniteScroll({
+    loading,
+    hasNextPage,
+    onLoadMore: loadMoreProducts,
+    // disabled: !!error,
+    rootMargin: "0px 0px 400px 0px",
+  });
 
   return (
     <AppLayout>
@@ -321,41 +335,22 @@ function Category() {
             </IconButton>
           </Grid>
           <Grid item xs={10} textAlign="center">
-            <Typography variant="h1">{displayCategoryName}</Typography>
+            <Typography variant="h1">Customer Section</Typography>
           </Grid>
         </Grid>
-        <Grid item pl={2} mt={3} sx={{ width: "100%" }}>
-          {/*  carousel content goes here */}
-          <Box sx={{ display: "flex", overflowX: "auto" }}>
-            {bestsellers?.map((bestseller) => (
-              <img
-                key={bestseller?._id}
-                height={isMobile ? "150px" : "200px"}
-                src={bestseller?.imageUrls[0]}
-                // alt={`Image ${index + 1}`}
-                style={{ marginRight: "8px" }}
-              />
-            ))}
-          </Box>
-        </Grid>
+
         <Grid
           container
           item
-          xs={12}
+          // xs={12}
           mt={3}
           mb={3}
           direction="row"
-          justifyContent="space-evenly"
+          justifyContent="space-between"
           alignItems="center"
         >
-          <Grid item xs={4}>
-            <Typography variant="h5">
-              {totalProducts} {displayCategoryName}
-            </Typography>
-          </Grid>
-
           {/* Filter Chip */}
-          <Grid container item xs={8} justifyContent="flex-end" columnGap={1}>
+          <Grid item xs={4}>
             <Box sx={{ ...circleStyle }}>
               <FilterMenu
                 filters={filters}
@@ -365,7 +360,47 @@ function Category() {
                 setSelectedColours={setSelectedColours}
               />
             </Box>
-            {isSearchExpanded === false && (
+          </Grid>
+
+          {/* Search Chip */}
+
+          <Grid item xs={8}>
+            {isSearchExpanded ? (
+              // <TextField
+              //   id="input-with-icon-textfield"
+              //   label={
+              //     <Typography sx={{ fontSize: "0.75rem" }}>
+              //       Search Customs
+              //     </Typography>
+              //   }
+              //   // variant="standard"
+              //   value={search}
+              //   onChange={handleSearchChange}
+              //   fullWidth
+              //   variant="filled"
+              //   size="small"
+              //   InputProps={{
+              //     endAdornment: (
+              //       <InputAdornment position="end">
+              //         <IconButton>
+              //           <SearchIcon />
+              //         </IconButton>
+              //       </InputAdornment>
+              //     ),
+              //   }}
+              // />
+              <DebouncedTextField
+                id="input-with-icon-textfield"
+                label={
+                  <Typography sx={{ fontSize: "0.75rem" }}>
+                    Search Customs
+                  </Typography>
+                }
+                fullWidth
+                size="small"
+                onChange={DebouncedSearch}
+              />
+            ) : (
               <Box sx={circleStyle}>
                 <IconButton onClick={handleSearchClick} sx={iconStyle}>
                   <SearchIcon />
@@ -373,27 +408,6 @@ function Category() {
               </Box>
             )}
           </Grid>
-
-          {/* Search Chip */}
-
-          {/* <Grid item xs={4}>
-            
-          </Grid> */}
-        </Grid>
-        <Grid item xs={12}>
-          {isSearchExpanded && (
-            <DebouncedTextField
-              id="input-with-icon-textfield"
-              label={
-                <Typography sx={{ fontSize: "0.75rem" }}>
-                  Search {displayCategoryName}
-                </Typography>
-              }
-              fullWidth
-              size="small"
-              onChange={DebouncedSearch}
-            />
-          )}
         </Grid>
         <Grid
           item
@@ -416,12 +430,7 @@ function Category() {
                 p={2}
                 alignItems="center"
               >
-                <Grid
-                  item
-                  onClick={() => {
-                    handleProductClick(product?.barcode); 
-                  }}
-                >
+                <Grid item>
                   <img
                     key={product?._id}
                     src={product?.imageUrl}
@@ -453,43 +462,6 @@ function Category() {
           ))}
         </Grid>
 
-        {/* <Grid container direction="row" spacing={2} mb={3}>
-          {products.map((product) => (
-            <Grid item xs={6} md={3} key={product._id}>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <img
-                  src={product.imageUrl}
-                  alt={product._id}
-                  style={{ marginBottom: "8px" }}
-                />
-                <Typography
-                  variant="body1"
-                  textAlign="center"
-                  sx={{
-                    maxWidth: "100%",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {product.productName}
-                </Typography>
-                <Typography variant="body1">
-                  Style Code - {product.styleCode}
-                </Typography>
-                <Typography variant="body1">
-                  Rs. {product.mrp?.toLocaleString()}
-                </Typography>
-              </Box>
-            </Grid>
-          ))}
-        </Grid> */}
-
         {(loading || hasNextPage) && (
           <Grid item alignSelf="center" ref={sentryRef}>
             <CircularProgress fontSize="small" />
@@ -505,4 +477,4 @@ function Category() {
   );
 }
 
-export default Category;
+export default OutOfStock;

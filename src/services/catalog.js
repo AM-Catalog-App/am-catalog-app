@@ -46,6 +46,16 @@ const getFilters = async () => {
         throw error;
     }
 }
+const getOutOfStockProducts = async ({ category, startIndex, endIndex, colour, location, search }) => {
+    try {
+        const { data } = await axiosInstance.get(`/catalog/products/out-of-stock?startIndex=${startIndex}&endIndex=${endIndex}&category=${category}&colour=${colour}&location=${location}&search=${search}`);
+        // console.log("data", data)
+        return data;
+    } catch (error) {
+        console.error('Error during fetching out-of-stock products list:', error);
+        throw error;
+    }
+}
 
 
-export { getAllCategories, getBestsellers, getProducts, getFilters }
+export { getAllCategories, getBestsellers, getProducts, getFilters, getOutOfStockProducts }

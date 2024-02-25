@@ -5,6 +5,7 @@ import { getAllCategories } from "../../services/catalog";
 import useIsMobile from "../../utils/useIsMobile";
 import AppLayout from "../../components/AppLayout/AppLayout";
 import colors from "../../styles/colors";
+import amLogo from "../../assets/amLogo1.png";
 function Catalog() {
   const [categories, setCategories] = useState([]);
   const isMobile = useIsMobile();
@@ -20,7 +21,8 @@ function Catalog() {
   };
 
   const handleClick = (name) => {
-    navigate(`/category?name=${name}`);
+    const encodedCategoryName = encodeURIComponent(name);
+    navigate(`/category/${encodedCategoryName}`);
   };
 
   useEffect(() => {
@@ -40,7 +42,10 @@ function Catalog() {
           item
           xs={12}
           p={2}
-          sx={{ backgroundColor: colors.white, width: "100%" }}
+          sx={{
+            //  backgroundColor: colors.white,
+            width: "100%",
+          }}
         >
           <Typography variant="h1">CATALOG</Typography>
         </Grid>
@@ -48,7 +53,10 @@ function Catalog() {
           item
           container
           mt={4}
-          sx={{ height: "100%", backgroundColor: colors.white }}
+          sx={{
+            height: "100%",
+            //  backgroundColor: colors.white
+          }}
         >
           {categories &&
             categories?.map((category) => (
@@ -62,19 +70,27 @@ function Catalog() {
                 direction="column"
                 justifyContent="center"
                 alignItems="center"
+                textAlign="center"
                 onClick={() => handleClick(category?.name)}
               >
                 <img
                   className=""
                   loading="lazy"
-                  src={category?.imageUrl}
+                  src={category?.imageUrl || amLogo}
                   height={isMobile ? "220px" : "400px"}
+                  onError={(e) => {
+                    e.target.src = amLogo; // Set backup image source when the original image fails to load
+                  }}
+                  style={{
+                    maxWidth: "100%", // Set maximum width to maintain aspect ratio
+                    height: "auto", // Automatically adjust height to maintain aspect ratio
+                  }}
                   // width={"160px"}
                   alt={category?.name}
                 />
                 <Typography
                   sx={{ marginTop: isMobile ? "20px" : "30px" }}
-                  variant="h6"
+                  variant="body1"
                 >
                   {category?.name}
                 </Typography>
