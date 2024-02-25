@@ -25,7 +25,7 @@ function AdminPortal() {
               Upload Catalog
             </Typography>
           </Box>
-          <Box className={styles.AdminFeature}>
+          <Box className={styles.AdminFeature} onClick={() => navigate('/updateCategory')}>
             <Typography variant="body1" color="initial" className={styles.Feature}>
               Add Category
             </Typography>

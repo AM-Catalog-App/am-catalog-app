@@ -1,0 +1,40 @@
+.Title {
+    font-weight: bold !important;
+ }
+ .UploadFile {
+     padding: 10px 0px;
+ }
+ .UploadFile::-webkit-file-upload-button {
+     border: none;
+     padding: 10px 20px;
+     color: white;
+     font-size: 16px;
+     background-color: #014785;
+     border-radius: 5px;
+     box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+     cursor: pointer;
+ }
+ .UploadButton {
+     margin-top: 20px;
+     background-color: #90af93 !important;
+     font-weight: bold !important;
+ }
+ .UploadButton:hover {
+     background-color: #6aa26e !important;
+ }
+ .UploadText {
+     font-weight: 600 !important;
+     color: white !important;
+ }
+ .CircularProgress {
+     width: 20px !important;
+     height: 20px !important;
+     color: white !important;
+ }
+ .ImageBox {
+     min-width: 400px;
+ }
+ .ImageBox img {
+     height: 450px;
+     width: auto;
+ }

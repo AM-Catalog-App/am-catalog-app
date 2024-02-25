@@ -9,6 +9,7 @@ import { ThemeProvider } from "@mui/material";
 import amTheme from "./styles/amTheme";
 import Category from "./features/category/Category";
 import ClientProductDetail from "./features/clientProductDetail/ClientProductDetail";
+import UpdateCategory from "./components/UpdateCategory/UpdateCategory";
 import OutOfStock from "./features/outOfStock/OutOfStock";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path="/admin" element={<AdminPortal />} />
           <Route path="/uploadCatalog" element={<ExcelReader />} />
           <Route path="/catalog" element={<Catalog />} />
+          <Route path="/updateCategory" element={<UpdateCategory />}/>
           <Route path="/category/:categoryName" element={<Category />} />
           <Route
             path="/product-detail/:barCode"
