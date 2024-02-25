@@ -9,6 +9,7 @@ import { ThemeProvider } from "@mui/material";
 import amTheme from "./styles/amTheme";
 import Category from "./features/category/Category";
 import ClientProductDetail from "./features/clientProductDetail/ClientProductDetail";
+import UpdateCategory from "./components/UpdateCategory/UpdateCategory";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/category" element={<Category />} />
           <Route path="/product-detail" element={<ClientProductDetail />} />
+          <Route path="/updateCategory" element={<UpdateCategory />}/>
         </Routes>
       </Router>
     </ThemeProvider>

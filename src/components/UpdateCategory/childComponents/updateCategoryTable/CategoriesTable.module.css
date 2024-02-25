@@ -1,0 +1,7 @@
+.UpdateButton {
+    background-color: #004785 !important;
+    font-weight: bold !important;
+}
+.UpdateButton:hover {
+    background-color: #1379d2 !important;
+}
