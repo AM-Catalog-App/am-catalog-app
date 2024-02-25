@@ -7,7 +7,7 @@ const colors = {
     light2: "#ECECEC",  // Inactive Element
     light1: "#F5F5F7",  // Background Table Placeholder
     white: "#F6F1EB",    // Light Background
-    grey: "C4C4C4",
+    grey: "#C4C4C4",
     green: "#90AF92",
     blue: "#004785"
 }

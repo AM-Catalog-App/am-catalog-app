@@ -7,12 +7,16 @@ import Chip from "@mui/material/Chip";
 import ImageSlider from "../../globalComponents/Image/ImageSlider/ImageSlider";
 import styles from "./ClientProductDetail.module.css";
 
+import { useParams } from "react-router-dom";
+
 export default function ClientProductDetail() {
   const [productDetails, setProductDetails] = useState(null);
-
+  const { barCode } = useParams();
   const fetchProductDetails = async () => {
     try {
-      const productDetails = await getProductDetails("AM/48425");
+      const productDetails = await getProductDetails(
+        decodeURIComponent(barCode)
+      );
       setProductDetails(productDetails);
     } catch (err) {
       console.error(err);
