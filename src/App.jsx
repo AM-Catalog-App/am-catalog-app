@@ -18,7 +18,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Welcome />} />
           <Route path="/admin" element={<AdminPortal />} />
-          <Route path="/excel-reader" element={<ExcelReader />} />
+          <Route path="/uploadCatalog" element={<ExcelReader />} />
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/category/:categoryName" element={<Category />} />
           <Route

@@ -18,7 +18,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import useInfiniteScroll from "react-infinite-scroll-hook";
 import {
   getBestsellers,

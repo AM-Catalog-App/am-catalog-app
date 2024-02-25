@@ -1,28 +1,47 @@
-import { useState } from 'react';
-import PropTypes from 'prop-types';
-import ImageSlider from '../../globalComponents/Image/ImageSlider/ImageSlider.jsx'; 
-import DeletableImage from '../../globalComponents/Image/DeletableImage/DeletableImage.jsx'; 
-import { normalizeString } from '../../utils/index.js';
-import { uploadProductImages } from '../../services/index.js';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import { useState } from "react";
+import PropTypes from "prop-types";
+import ImageSlider from "../../globalComponents/Image/ImageSlider/ImageSlider.jsx";
+import DeletableImage from "../../globalComponents/Image/DeletableImage/DeletableImage.jsx";
+import { normalizeString } from "../../utils/index.js";
+import { uploadProductImages } from "../../services/index.js";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Stack,
+  Typography,
+  CircularProgress,
+  Box,
+} from "@mui/material";
+import styles from "./ProductImageUploader.module.css";
 
-function ProductImageUploader({ productId, barcode, onClose, open }) {
-  const [images, setImages] = useState([]);
+function ProductImageUploader({
+  productId,
+  barcode,
+  onClose,
+  open,
+  imageUrls,
+  onSuccessfulUpload,
+}) {
+  const [images, setImages] = useState(imageUrls);
+  const [uploading, setUploading] = useState(false);
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
-    files.forEach(file => {
+    files.forEach((file) => {
       const reader = new FileReader();
       reader.onload = () => {
         const imageData = reader.result;
-        setImages(prevImages => [...prevImages, imageData]);
+        setImages((prevImages) => [...prevImages, imageData]);
       };
       reader.readAsDataURL(file);
     });
   };
 
   const handleDeleteImage = (index) => {
-    setImages(prevImages => prevImages.filter((_, i) => i !== index));
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
   const handleCancel = () => {
@@ -32,35 +51,63 @@ function ProductImageUploader({ productId, barcode, onClose, open }) {
 
   const handleDone = async () => {
     try {
-
-      const imageDataArray = images.map((image, index) => ({
-        fileName: `${normalizeString(barcode)}/image-${index+1}`,
-        data: image.split(',')[1], // Extract the base64 data
+      setUploading(true);
+      const filteredImages = images.filter((image) => !image.includes('http'));
+      const imageDataArray = filteredImages.map((image, index) => ({
+        fileName: `${normalizeString(barcode)}/image-${index + 1}`,
+        data: image.split(",")[1], // Extract the base64 data
       }));
-  
-      await uploadProductImages(imageDataArray, productId);
-  
-      alert('Images uploaded successfully!');
+
+      const uploadedImagesUrl = await uploadProductImages(imageDataArray, productId);
+      onSuccessfulUpload(uploadedImagesUrl);
+      setUploading(false);
+
+      alert("Images uploaded successfully!");
       onClose();
     } catch (error) {
-      console.error('Error uploading images:', error);
-      alert('Failed to upload images. Please try again.');
+      console.error("Error uploading images:", error);
+      alert("Failed to upload images. Please try again.");
     }
   };
-  
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Upload Product Images</DialogTitle>
+    <Dialog maxWidth="md" open={open} onClose={onClose}>
+      <DialogTitle className={styles.Title}>Upload Product Images</DialogTitle>
       <DialogContent>
-        <ImageSlider images={images.map((image, index) => (
-          <DeletableImage key={index} src={image} onDelete={() => handleDeleteImage(index)} />
-        ))} />
-        <input type="file" accept="image/*" multiple onChange={handleImageUpload} />
+        <Box className={styles.ImageBox}>
+          <ImageSlider
+            images={images.map((image, index) => (
+              <DeletableImage key={index} src={image} onDelete={() => handleDeleteImage(index)} />
+            ))}
+          />
+        </Box>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleImageUpload}
+          className={styles.UploadFile}
+        />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCancel}>Cancel</Button>
-        <Button onClick={handleDone}>Done</Button>
+        <Button variant="contained" color="secondary" onClick={handleCancel}>
+          <Typography variant="body2" color="initial" className={styles.UploadText}>
+            Cancel
+          </Typography>
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleDone}
+          className={styles.UploadButton}
+        >
+          <Stack direction="row" alignItemst="center" justifyContent="center" spacing={2}>
+            <Typography variant="body2" color="initial" className={styles.UploadText}>
+              Upload
+            </Typography>
+            {uploading && <CircularProgress className={styles.CircularProgress} />}
+          </Stack>
+        </Button>
       </DialogActions>
     </Dialog>
   );
@@ -70,7 +117,9 @@ ProductImageUploader.propTypes = {
   productId: PropTypes.string.isRequired,
   barcode: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
-  open: PropTypes.bool.isRequired
+  open: PropTypes.bool.isRequired,
+  imageUrls: PropTypes.array,
+  onSuccessfulUpload: PropTypes.func,
 };
 
 export default ProductImageUploader;
