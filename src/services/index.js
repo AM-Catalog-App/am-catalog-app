@@ -1,21 +1,15 @@
-import axios from 'axios';
-
-const BASE_URL = 'http://localhost:8080';
-
-const axiosInstance = axios.create({
-    baseURL: BASE_URL,
-});
+import axiosInstance from "../constants/axiosInstance";
 
 export const bulkUploadProducts = async (products) => {
-    const url = '/admin/bulk-product-upload';
-    try {
-        const response = await axiosInstance.post(url, products);
+  const url = "/admin/bulk-product-upload";
+  try {
+    const response = await axiosInstance.post(url, products);
 
-        return response.data;
-    } catch (error) {
-        console.error('Error during bulk upload:', error);
-        throw error; 
-    }
+    return response.data;
+  } catch (error) {
+    console.error("Error during bulk upload:", error);
+    throw error;
+  }
 };
 
 export const uploadProductImages = async (imageDataArray, productId) => {
@@ -35,4 +29,15 @@ export const uploadProductImages = async (imageDataArray, productId) => {
     throw error;
   }
 };
-  
+
+export const updateCategoryImage = async (imageData) => {
+  const url = "/admin/update-category-image";
+  try {
+    const response = await axiosInstance.post(url, imageData);
+
+    return response.data;
+  } catch (error) {
+    console.error("Upload failed", error.response?.status, error.response?.data);
+    throw error;
+  }
+};

@@ -1,9 +1,7 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
-import ImageSlider from "../../globalComponents/Image/ImageSlider/ImageSlider.jsx";
-import DeletableImage from "../../globalComponents/Image/DeletableImage/DeletableImage.jsx";
-import { normalizeString } from "../../utils/index.js";
-import { uploadProductImages } from "../../services/index.js";
+import DeletableImage from "../../../../globalComponents/Image/DeletableImage/DeletableImage.jsx";
+import { updateCategoryImage } from "../../../../services/index.js";
 import {
   Dialog,
   DialogTitle,
@@ -15,52 +13,51 @@ import {
   CircularProgress,
   Box,
 } from "@mui/material";
-import styles from "./ProductImageUploader.module.css";
+import styles from "./UpdateCategoryImage.module.css";
 
-function ProductImageUploader({
-  productId,
-  barcode,
+function UpdateCategoryImage({
+  categoryName = null,
   onClose,
   open,
-  imageUrls,
+  imageUrl = "",
   onSuccessfulUpload,
 }) {
-  const [images, setImages] = useState(imageUrls);
+  const [image, setImage] = useState(imageUrl);
   const [uploading, setUploading] = useState(false);
 
   const handleImageUpload = (event) => {
-    const files = Array.from(event.target.files);
-    files.forEach((file) => {
+    const file = event.target.files[0];
+
+    if (file) {
       const reader = new FileReader();
       reader.onload = () => {
         const imageData = reader.result;
-        setImages((prevImages) => [...prevImages, imageData]);
+        setImage(imageData);
       };
       reader.readAsDataURL(file);
-    });
+    }
   };
 
-  const handleDeleteImage = (index) => {
-    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
-    console.log(index, "delete image");
+  const handleDeleteImage = (image) => {
+    console.log(image, "delete image");
   };
 
   const handleCancel = () => {
-    setImages([]);
+    setImage("");
     onClose();
   };
 
   const handleDone = async () => {
     try {
+      if (image.startsWith("http") && image.includes("amazonaws.com")) return;
       setUploading(true);
-      const filteredImages = images.filter((image) => !image.includes('http'));
-      const imageDataArray = filteredImages.map((image, index) => ({
-        fileName: `${normalizeString(barcode)}/image-${index + 1}`,
-        data: image.split(",")[1], // Extract the base64 data
-      }));
+      const imageData = {
+        categoryName,
+        categoryImage: image.split(",")[1],
+      };
 
-      const uploadedImagesUrl = await uploadProductImages(imageDataArray, productId);
-      onSuccessfulUpload(uploadedImagesUrl);
+      const { categoryImageUrl } = await updateCategoryImage(imageData);
+      onSuccessfulUpload(categoryImageUrl);
       setUploading(false);
 
       alert("Images uploaded successfully!");
@@ -73,19 +70,14 @@ function ProductImageUploader({
 
   return (
     <Dialog maxWidth="md" open={open} onClose={onClose}>
-      <DialogTitle className={styles.Title}>Upload Product Images</DialogTitle>
+      <DialogTitle className={styles.Title}>Upload Category Image</DialogTitle>
       <DialogContent>
         <Box className={styles.ImageBox}>
-          <ImageSlider
-            images={images.map((image, index) => (
-              <DeletableImage key={index} src={image} onDelete={() => handleDeleteImage(index)} />
-            ))}
-          />
+          <DeletableImage src={image} onDelete={() => handleDeleteImage(image)} />
         </Box>
         <input
           type="file"
           accept="image/*"
-          multiple
           onChange={handleImageUpload}
           className={styles.UploadFile}
         />
@@ -114,13 +106,12 @@ function ProductImageUploader({
   );
 }
 
-ProductImageUploader.propTypes = {
-  productId: PropTypes.string.isRequired,
-  barcode: PropTypes.string.isRequired,
+UpdateCategoryImage.propTypes = {
+  categoryName: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
-  imageUrls: PropTypes.array,
+  imageUrl: PropTypes.string,
   onSuccessfulUpload: PropTypes.func,
 };
 
-export default ProductImageUploader;
+export default UpdateCategoryImage;
