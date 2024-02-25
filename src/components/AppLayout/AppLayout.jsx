@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   CssBaseline,
   Box,
@@ -18,7 +18,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HomeIcon from "@mui/icons-material/Home";
 import colors from "../../styles/colors";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function AppLayout({ children }) {
   return (
@@ -40,9 +40,21 @@ function AppLayout({ children }) {
 export default AppLayout;
 
 export function FixedBottomNavigation() {
+  const location = useLocation();
+
   const [value, setValue] = useState("");
+
   const ref = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Extract the current pathname from the location
+    let { pathname } = location;
+    pathname = pathname.replace("/", "");
+
+    // Set the value based on the pathname
+    setValue(pathname === "out-of-stock" ? pathname : "catalog");
+  }, [location]);
 
   const handleNavigate = (pageLink) => {
     navigate(`/${pageLink}`);

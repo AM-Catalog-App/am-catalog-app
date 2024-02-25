@@ -18,7 +18,8 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
+
 import useInfiniteScroll from "react-infinite-scroll-hook";
 import {
   getBestsellers,
@@ -419,7 +420,7 @@ function Category() {
                 <Grid
                   item
                   onClick={() => {
-                    handleProductClick(product?.barcode); 
+                    handleProductClick(product?.barcode);
                   }}
                 >
                   <img
