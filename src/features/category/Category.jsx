@@ -146,7 +146,7 @@ function FilterMenu({
                   {capitalizeFirstLetter(category)}
                 </Typography>
               </AccordionSummary>
-              <AccordionDetails sx={{ backgroundColor: colors.light1 }}>
+              <AccordionDetails>
                 <Stack>
                   {values.map((value) => (
                     <FormControlLabel
@@ -304,107 +304,110 @@ function Category() {
 
   return (
     <AppLayout>
-      <Grid container direction="column" alignItems="center" mt={3} p={2}>
+      <Grid container direction="column" alignItems="center">
         <Grid
-          container
           item
-          direction="row"
-          justifyContent="flex-start"
-          alignItems="center"
-        >
-          <Grid item xs={1} alignSelf="center">
-            <IconButton
-              onClick={() => {
-                navigate(-1);
-              }}
-            >
-              <ArrowBackIosNewIcon fontSize="small" />
-            </IconButton>
-          </Grid>
-          <Grid item xs={10} textAlign="center">
-            <Typography variant="h1">{displayCategoryName}</Typography>
-          </Grid>
-        </Grid>
-        <Grid item pl={2} mt={3} sx={{ width: "100%" }}>
-          {/*  carousel content goes here */}
-          <Box sx={{ display: "flex", overflowX: "auto" }}>
-            {bestsellers?.map((bestseller) => (
-              <img
-                key={bestseller?._id}
-                height={isMobile ? "150px" : "200px"}
-                src={bestseller?.imageUrls[0]}
-                // alt={`Image ${index + 1}`}
-                style={{ marginRight: "8px" }}
-              />
-            ))}
-          </Box>
-        </Grid>
-        <Grid
           container
-          item
-          xs={12}
-          mt={3}
-          mb={3}
-          direction="row"
-          justifyContent="space-evenly"
-          alignItems="center"
+          p={2}
+          backgroundColor={colors.light1}
+          sx={{ position: "sticky", top: "0px" }}
         >
-          <Grid item xs={4}>
-            <Typography variant="h6">
-              {totalProducts} {displayCategoryName}
-            </Typography>
+          <Grid
+            container
+            item
+            direction="row"
+            justifyContent="flex-start"
+            alignItems="center"
+          >
+            <Grid item xs={1} alignSelf="center">
+              <IconButton
+                onClick={() => {
+                  navigate(-1);
+                }}
+              >
+                <ArrowBackIosNewIcon fontSize="small" />
+              </IconButton>
+            </Grid>
+            <Grid item xs={10} textAlign="center">
+              <Typography variant="h1">{displayCategoryName}</Typography>
+            </Grid>
           </Grid>
-
-          {/* Filter Chip */}
-          <Grid container item xs={8} justifyContent="flex-end" columnGap={1}>
-            <Box sx={{ ...circleStyle }}>
-              <FilterMenu
-                filters={filters}
-                selectedLocations={selectedLocations}
-                selectedColours={selectedColours}
-                setSelectedLocations={setSelectedLocations}
-                setSelectedColours={setSelectedColours}
-              />
+          <Grid item pl={2} mt={3} sx={{ width: "100%" }}>
+            {/*  carousel content goes here */}
+            <Box sx={{ display: "flex", overflowX: "auto" }}>
+              {bestsellers?.map((bestseller) => {
+                if (bestseller?.imageUrls?.length > 0)
+                  return (
+                    <img
+                      key={bestseller?._id}
+                      height={isMobile ? "150px" : "200px"}
+                      src={bestseller?.imageUrls[0]}
+                      // alt={`Image ${index + 1}`}
+                      style={{ marginRight: "8px" }}
+                    />
+                  );
+              })}
             </Box>
-            {isSearchExpanded === false && (
-              <Box sx={circleStyle}>
-                <IconButton onClick={handleSearchClick} sx={iconStyle}>
-                  <SearchIcon />
-                </IconButton>
-              </Box>
-            )}
           </Grid>
+          <Grid
+            container
+            item
+            xs={12}
+            mt={3}
+            mb={3}
+            direction="row"
+            justifyContent="space-evenly"
+            alignItems="center"
+          >
+            <Grid item xs={6}>
+              <Typography noWrap variant="h6">
+                {totalProducts} {displayCategoryName}(s)
+              </Typography>
+            </Grid>
 
-          {/* Search Chip */}
+            {/* Filter Chip */}
+            <Grid container item xs={6} justifyContent="flex-end" columnGap={1}>
+              <Box sx={{ ...circleStyle }}>
+                <FilterMenu
+                  filters={filters}
+                  selectedLocations={selectedLocations}
+                  selectedColours={selectedColours}
+                  setSelectedLocations={setSelectedLocations}
+                  setSelectedColours={setSelectedColours}
+                />
+              </Box>
+              {isSearchExpanded === false && (
+                <Box sx={circleStyle}>
+                  <IconButton onClick={handleSearchClick} sx={iconStyle}>
+                    <SearchIcon />
+                  </IconButton>
+                </Box>
+              )}
+            </Grid>
 
-          {/* <Grid item xs={4}>
+            {/* Search Chip */}
+
+            {/* <Grid item xs={4}>
             
           </Grid> */}
+          </Grid>
+          <Grid item xs={12} mb={2}>
+            {isSearchExpanded && (
+              <DebouncedTextField
+                id="input-with-icon-textfield"
+                label={
+                  <Typography sx={{ fontSize: "0.75rem" }}>
+                    Search {displayCategoryName}
+                  </Typography>
+                }
+                fullWidth
+                size="small"
+                onChange={DebouncedSearch}
+              />
+            )}
+          </Grid>
         </Grid>
-        <Grid item xs={12}>
-          {isSearchExpanded && (
-            <DebouncedTextField
-              id="input-with-icon-textfield"
-              label={
-                <Typography sx={{ fontSize: "0.75rem" }}>
-                  Search {displayCategoryName}
-                </Typography>
-              }
-              fullWidth
-              size="small"
-              onChange={DebouncedSearch}
-            />
-          )}
-        </Grid>
-        <Grid
-          item
-          container
-          mb={3}
-          direction="row"
-          // justifyContent="center"
-          // alignItems="center"
-          // onClick={() => handleClick(category?.name)}
-        >
+        <Grid item container mb={3} p={2} direction="row">
           {products?.map((product) => (
             <>
               <Grid

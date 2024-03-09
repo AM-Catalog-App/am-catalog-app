@@ -127,42 +127,6 @@ function FilterMenu({
         onClose={handleFilterClose}
         sx={{ borderRadius: "50px", width: "300px" }}
       >
-        {/* <Stack p={2}>
-          <Typography variant="h6">Filters</Typography>
-          {Object.entries(filters).map(([category, values]) => (
-            <Accordion sx={{ padding: "10px" }} key={category}>
-              <AccordionSummary expandIcon={<ExpandMore />}>
-                {category}
-              </AccordionSummary>
-              <AccordionDetails>
-                <Stack>
-                  {values.map((value) => (
-                    <FormControlLabel
-                      key={value._id}
-                      control={
-                        <Checkbox
-                          checked={
-                            category === "location"
-                              ? selectedLocations?.includes(value.name)
-                              : selectedColours?.includes(value.name)
-                          }
-                          onChange={() => {
-                            if (category === "location") {
-                              handleLocationSelect(value?.name);
-                            } else {
-                              handleColourSelect(value?.name);
-                            }
-                          }}
-                        />
-                      }
-                      label={value.name}
-                    />
-                  ))}
-                </Stack>
-              </AccordionDetails>
-            </Accordion>
-          ))}
-        </Stack> */}
         <Stack>
           <Typography sx={{ pl: 3 }} variant="h6">
             Filters
@@ -177,7 +141,7 @@ function FilterMenu({
                   {capitalizeFirstLetter(category)}
                 </Typography>
               </AccordionSummary>
-              <AccordionDetails sx={{ backgroundColor: colors.light1 }}>
+              <AccordionDetails>
                 <Stack>
                   {values.map((value) => (
                     <FormControlLabel
@@ -324,6 +288,7 @@ function OutOfStock() {
           direction="row"
           justifyContent="flex-start"
           alignItems="center"
+          position="sticky"
         >
           <Grid item xs={1} alignSelf="center">
             <IconButton
@@ -366,29 +331,6 @@ function OutOfStock() {
 
           <Grid item xs={8}>
             {isSearchExpanded ? (
-              // <TextField
-              //   id="input-with-icon-textfield"
-              //   label={
-              //     <Typography sx={{ fontSize: "0.75rem" }}>
-              //       Search Customs
-              //     </Typography>
-              //   }
-              //   // variant="standard"
-              //   value={search}
-              //   onChange={handleSearchChange}
-              //   fullWidth
-              //   variant="filled"
-              //   size="small"
-              //   InputProps={{
-              //     endAdornment: (
-              //       <InputAdornment position="end">
-              //         <IconButton>
-              //           <SearchIcon />
-              //         </IconButton>
-              //       </InputAdornment>
-              //     ),
-              //   }}
-              // />
               <DebouncedTextField
                 id="input-with-icon-textfield"
                 label={
