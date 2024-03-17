@@ -1,14 +1,21 @@
 .DeletableImage {
+    position: relative; /* Added to establish a containing block for absolute positioning */
     padding: 14px;
+    contain: layout style; /* CSS containment */
 }
-.deleteButton {
+
+.DeletableImage .deleteButton {
     position: absolute !important;
     right: 0 !important;
     top: 0 !important;
     color: rgba(255, 255, 255, 1) !important;
     background-color: rgba(0, 0, 0, 0.4) !important;
-    transform: translate(-2px, 2px);
+    transform: translate(-2px, 2px) !important; /* Use !important to ensure transform isn't overridden */
     border-radius: 50% !important;
     padding: 5px !important;
+    margin: 0 !important; /* Reset margin to avoid external influence */
+    border: none !important; /* Prevent external borders */
+    font-size: initial; /* Avoid inheriting font size */
+    line-height: initial; /* Avoid inheriting line height */
+
 }
-  

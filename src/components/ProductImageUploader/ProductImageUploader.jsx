@@ -53,7 +53,7 @@ function ProductImageUploader({
   const handleDone = async () => {
     try {
       setUploading(true);
-      const filteredImages = images.filter((image) => !image.includes('http'));
+      const filteredImages = images.filter((image) => !image.includes("http"));
       const imageDataArray = filteredImages.map((image, index) => ({
         fileName: `${normalizeString(barcode)}/image-${index + 1}`,
         data: image.split(",")[1], // Extract the base64 data
@@ -78,7 +78,13 @@ function ProductImageUploader({
         <Box className={styles.ImageBox}>
           <ImageSlider
             images={images.map((image, index) => (
-              <DeletableImage key={index} src={image} onDelete={() => handleDeleteImage(index)} />
+              <DeletableImage
+                key={index}
+                src={image}
+                onDelete={() => {
+                  handleDeleteImage(index);
+                }}
+              />
             ))}
           />
         </Box>
@@ -102,7 +108,7 @@ function ProductImageUploader({
           onClick={handleDone}
           className={styles.UploadButton}
         >
-          <Stack direction="row" alignItemst="center" justifyContent="center" spacing={2}>
+          <Stack direction="row" alignItems="center" justifyContent="center" spacing={2}>
             <Typography variant="body2" color="initial" className={styles.UploadText}>
               Upload
             </Typography>

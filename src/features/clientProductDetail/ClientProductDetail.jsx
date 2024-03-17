@@ -45,6 +45,7 @@ export default function ClientProductDetail() {
         <Box className={styles.ProductDetailPage}>
           <Box className={styles.ProductImages}>
             <ImageSlider
+              showBackButton={true}
               images={productDetails.imageUrls.map((image, index) => (
                 <img key={index} src={image} />
               ))}

@@ -8,7 +8,7 @@ function DeletableImage({ src, onDelete }) {
     <Stack direction="column" className={styles.DeletableImage}>
       <img src={src} alt="Deletable" className={styles.image} />
       <IconButton onClick={onDelete} className={styles.deleteButton} aria-label="delete image">
-        <CloseIcon fontSize="small" />
+        <CloseIcon fontSize="small" sx={{ cursor: "pointer" }} />
       </IconButton>
     </Stack>
   );

@@ -132,12 +132,24 @@ function ExcelReader() {
   };
 
   return (
-    <Stack justifyContent="center" alignItems="center" spacing={2} className={styles.UploadCatalog}>
-      <Stack direction="row" alignItems="center" justifyContent="center" spacing={3}>
-        <Typography variant="h1" color="initial">
-          Upload Catalog
-        </Typography>
-        <img src={AMLogoLeaf} alt="AM Logo" className={styles.AMLogoLeaf} />
+    <Stack
+      justifyContent="center"
+      alignItems="center"
+      spacing={2}
+      pt={0}
+      mt={0}
+      className={styles.UploadCatalog}
+    >
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="center"
+        spacing={3}
+        className={styles.Header}
+        mt={0}
+      >
+        <Typography variant="h2">Upload Catalog</Typography>
+        {/* <img src={AMLogoLeaf} alt="AM Logo" className={styles.AMLogoLeaf} /> */}
       </Stack>
       <Stack direction="row" alignSelf="flex-start" alignItems="center" spacing={4}>
         <input
@@ -154,7 +166,7 @@ function ExcelReader() {
           onClick={handleBulkUpload}
           className={styles.UploadButton}
         >
-          <Stack direction="row" alignItemst="center" justifyContent="center" spacing={2}>
+          <Stack direction="row" alignItems="center" justifyContent="center" spacing={2}>
             <Typography variant="body1" color="initial" className={styles.UploadText}>
               Upload
             </Typography>
@@ -260,8 +272,8 @@ function ExcelReader() {
           onSuccessfulUpload={(imageUrls) => {
             const tableDataClone = JSON.parse(JSON.stringify(tableData));
             for (let index = 0; index < tableDataClone.length; index++) {
-              if (tableDataClone[index]['_id'] === selectedProductId) {
-                tableDataClone[index]['imageUrls'] = imageUrls;
+              if (tableDataClone[index]["_id"] === selectedProductId) {
+                tableDataClone[index]["imageUrls"] = imageUrls;
                 break;
               }
             }

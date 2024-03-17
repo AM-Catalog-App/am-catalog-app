@@ -2,10 +2,9 @@ import PropTypes from "prop-types";
 import Carousel from "react-material-ui-carousel";
 import NoProductImage from "../../../assets/NoProductImage.png";
 import { Box } from "@mui/material";
-import colors from "../../../styles/colors";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-function ImageSlider({ images }) {
+function ImageSlider({ images, showBackButton = false }) {
   const navigate = useNavigate();
   if (images.length === 0) {
     return <img src={NoProductImage} alt="No Images" />;
@@ -13,25 +12,26 @@ function ImageSlider({ images }) {
 
   return (
     <div style={{ position: "relative" }}>
-      <ArrowBackIosNewIcon
-        style={{
-          position: "absolute",
-          top: 10,
-          left: 10,
-          zIndex: 999,
-          cursor: "pointer",
-        }}
-        onClick={() => {
-          navigate(-1);
-        }}
-      />
+      {showBackButton && ( // Conditional rendering of the back button
+        <ArrowBackIosNewIcon
+          style={{
+            position: "absolute",
+            top: 10,
+            left: 10,
+            zIndex: 999,
+            cursor: "pointer",
+          }}
+          onClick={() => {
+            navigate(-1);
+          }}
+        />
+      )}
       <Carousel animation="slide" indicators={true}>
         {images.map((imageOrComponent, index) => (
           <Box
             sx={{
               display: "flex",
-              justifyContent: "center",
-              background: colors.white,
+              justifyContent: "center"
             }}
             key={index}
           >
@@ -48,9 +48,9 @@ function ImageSlider({ images }) {
 }
 
 ImageSlider.propTypes = {
-  images: PropTypes.arrayOf(
-    PropTypes.oneOfType([PropTypes.string, PropTypes.elementType])
-  ).isRequired,
+  images: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.elementType]))
+    .isRequired,
+  showBackButton: PropTypes.bool, // New prop type for showBackButton
 };
 
 export default ImageSlider;

@@ -12,7 +12,7 @@ const PRODUCT_DETAIL_EXCEL_COLUMN_NAMES = [
   "collection",
   "category",
   "mrp",
-  "imageUrls"
+  "imageUrls",
 ];
 
 export { PRODUCT_DETAIL_EXCEL_COLUMN_NAMES };

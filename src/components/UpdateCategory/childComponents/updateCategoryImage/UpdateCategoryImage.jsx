@@ -94,7 +94,7 @@ function UpdateCategoryImage({
           onClick={handleDone}
           className={styles.UploadButton}
         >
-          <Stack direction="row" alignItemst="center" justifyContent="center" spacing={2}>
+          <Stack direction="row" alignItems="center" justifyContent="center" spacing={2}>
             <Typography variant="body2" color="initial" className={styles.UploadText}>
               Upload
             </Typography>
