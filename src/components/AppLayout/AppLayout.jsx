@@ -94,11 +94,11 @@ export function FixedBottomNavigation() {
             icon={<MenuIcon />}
             value={"out-of-stock"}
           />
-          {/* <BottomNavigationAction
+          <BottomNavigationAction
             label={<Typography variant="body2">Admin</Typography>}
             icon={<AccountCircleIcon />}
-            value={""}
-          /> */}
+            value={"admin"}
+          />
         </BottomNavigation>
       </Paper>
     </Box>
