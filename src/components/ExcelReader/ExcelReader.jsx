@@ -18,6 +18,7 @@ import { Box, Stack, Typography, Button, CircularProgress } from "@mui/material"
 import { bulkUploadProducts } from "../../services/index";
 import ProductImageUploader from "../ProductImageUploader/ProductImageUploader";
 import styles from "./ExcelReader.module.css";
+import AppLayout from "../../components/AppLayout/AppLayout";
 import AMLogoLeaf from "../../assets/amLogoLeaf.png";
 
 function ExcelReader() {
@@ -132,6 +133,9 @@ function ExcelReader() {
   };
 
   return (
+    <AppLayout>
+
+    
     <Stack
       justifyContent="center"
       alignItems="center"
@@ -282,6 +286,7 @@ function ExcelReader() {
         />
       )}
     </Stack>
+    </AppLayout>
   );
 }
 
