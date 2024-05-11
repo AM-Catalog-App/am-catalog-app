@@ -10,7 +10,7 @@
     top: 0 !important;
     color: rgba(255, 255, 255, 1) !important;
     background-color: rgba(0, 0, 0, 0.4) !important;
-    transform: translate(-2px, 2px) !important; /* Use !important to ensure transform isn't overridden */
+    transform: translate(-20px, 20px) !important; /* Use !important to ensure transform isn't overridden */
     border-radius: 50% !important;
     padding: 5px !important;
     margin: 0 !important; /* Reset margin to avoid external influence */

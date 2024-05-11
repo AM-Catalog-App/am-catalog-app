@@ -8,6 +8,7 @@ import {
   TableRow,
   Paper,
   Button,
+  Box,
 } from "@mui/material";
 import { getAllCategories } from "../../../../services/catalog";
 import styles from "./CategoriesTable.module.css";
@@ -17,7 +18,8 @@ export default function CategoriesTable() {
   const [categories, setCategories] = useState([]);
   const [selectedCategoryName, setSelectedCategoryName] = useState("");
   const [selectedCategoryImageUrl, setSelectedCategoryImageUrl] = useState("");
-  const [isUpdateCategoryImageOpen, setUpdateCategoryImageOpen] = useState(false);
+  const [isUpdateCategoryImageOpen, setUpdateCategoryImageOpen] =
+    useState(false);
   useEffect(() => {
     getAllCategories().then((data) => {
       setCategories(data);
@@ -34,24 +36,36 @@ export default function CategoriesTable() {
         </TableHead>
         <TableBody>
           {categories.map((category) => (
-            <TableRow key={category._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+            <TableRow
+              key={category._id}
+              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+            >
               <TableCell>{category.name}</TableCell>
               <TableCell>
-                {category.imageUrl && (
-                  <img src={category?.imageUrl} height="220px" width="160px" alt={category?.name} />
-                )}
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => {
-                    setSelectedCategoryName(category.name);
-                    setSelectedCategoryImageUrl(category.imageUrl);
-                    setUpdateCategoryImageOpen(true);
-                  }}
-                  className={styles.UpdateButton}
-                >
-                  Update
-                </Button>
+                <Box sx={{ justifyContent: "column nowrap" }}>
+                  <Box>
+                    {category.imageUrl && (
+                      <img
+                        src={category?.imageUrl}
+                        height="220px"
+                        width="160px"
+                        alt={category?.name}
+                      />
+                    )}
+                  </Box>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      setSelectedCategoryName(category.name);
+                      setSelectedCategoryImageUrl(category.imageUrl);
+                      setUpdateCategoryImageOpen(true);
+                    }}
+                    className={styles.UpdateButton}
+                  >
+                    Update
+                  </Button>
+                </Box>
               </TableCell>
             </TableRow>
           ))}
@@ -66,8 +80,8 @@ export default function CategoriesTable() {
           onSuccessfulUpload={(imageUrl) => {
             const categoriesClone = JSON.parse(JSON.stringify(categories));
             for (let index = 0; index < categoriesClone.length; index++) {
-              if (categoriesClone[index]['name'] === selectedCategoryName) {
-                categoriesClone[index]['imageUrl'] = imageUrl;
+              if (categoriesClone[index]["name"] === selectedCategoryName) {
+                categoriesClone[index]["imageUrl"] = imageUrl;
                 break;
               }
             }

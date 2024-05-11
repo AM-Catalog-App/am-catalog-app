@@ -39,7 +39,7 @@ function UpdateCategoryImage({
   };
 
   const handleDeleteImage = (image) => {
-    console.log(image, "delete image");
+    setImage("");
   };
 
   const handleCancel = () => {
@@ -73,7 +73,10 @@ function UpdateCategoryImage({
       <DialogTitle className={styles.Title}>Upload Category Image</DialogTitle>
       <DialogContent>
         <Box className={styles.ImageBox}>
-          <DeletableImage src={image} onDelete={() => handleDeleteImage(image)} />
+          <DeletableImage
+            src={image}
+            onDelete={() => handleDeleteImage(image)}
+          />
         </Box>
         <input
           type="file"
@@ -84,7 +87,11 @@ function UpdateCategoryImage({
       </DialogContent>
       <DialogActions>
         <Button variant="contained" color="secondary" onClick={handleCancel}>
-          <Typography variant="body2" color="initial" className={styles.UploadText}>
+          <Typography
+            variant="body2"
+            color="initial"
+            className={styles.UploadText}
+          >
             Cancel
           </Typography>
         </Button>
@@ -94,11 +101,22 @@ function UpdateCategoryImage({
           onClick={handleDone}
           className={styles.UploadButton}
         >
-          <Stack direction="row" alignItems="center" justifyContent="center" spacing={2}>
-            <Typography variant="body2" color="initial" className={styles.UploadText}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+            spacing={2}
+          >
+            <Typography
+              variant="body2"
+              color="initial"
+              className={styles.UploadText}
+            >
               Upload
             </Typography>
-            {uploading && <CircularProgress className={styles.CircularProgress} />}
+            {uploading && (
+              <CircularProgress className={styles.CircularProgress} />
+            )}
           </Stack>
         </Button>
       </DialogActions>
