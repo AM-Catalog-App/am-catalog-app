@@ -6,7 +6,7 @@ import Welcome from "./components/Welcome/Welcome";
 import ExcelReader from "./components/ExcelReader/ExcelReader";
 import Catalog from "./features/catalog/Catalog";
 import { ThemeProvider } from "@mui/material";
-import amTheme from "../styles/amTheme";
+import amTheme from "./styles/amTheme";
 import Category from "./features/category/Category";
 import ClientProductDetail from "./features/clientProductDetail/ClientProductDetail";
 import UpdateCategory from "./components/UpdateCategory/UpdateCategory";

@@ -17,7 +17,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HomeIcon from "@mui/icons-material/Home";
-import colors from "../../../styles/colors";
+import colors from "../../styles/colors";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function AppLayout({ children }) {
