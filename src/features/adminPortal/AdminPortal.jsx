@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Stack } from "@mui/material";
 import styles from "./AdminPortal.module.css";
-import AMLogo from "../../assets/amLogoLeaf.png";
+import AMLogo from "../../assets/amLogo1.png";
 import AppLayout from "../../components/AppLayout/AppLayout";
 
 function AdminPortal() {
