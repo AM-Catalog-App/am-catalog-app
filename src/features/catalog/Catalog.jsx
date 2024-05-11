@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { getAllCategories } from "../../services/catalog";
 import useIsMobile from "../../utils/useIsMobile";
 import AppLayout from "../../components/AppLayout/AppLayout";
-import colors from "../../styles/colors";
 import amLogo from "../../assets/amLogo1.png";
 function Catalog() {
   const [categories, setCategories] = useState([]);
@@ -43,7 +42,6 @@ function Catalog() {
           xs={12}
           p={2}
           sx={{
-            //  backgroundColor: colors.white,
             width: "100%",
           }}
         >
@@ -55,7 +53,6 @@ function Catalog() {
           mt={4}
           sx={{
             height: "100%",
-            //  backgroundColor: colors.white
           }}
         >
           {categories &&

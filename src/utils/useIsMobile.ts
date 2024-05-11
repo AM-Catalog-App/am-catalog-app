@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import theme from "../styles/amTheme";
+import theme from "../../styles/amTheme";
 
 interface IProp {
   breakpointValue?: "md" | "sm";

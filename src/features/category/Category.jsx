@@ -28,7 +28,7 @@ import {
 } from "../../services/catalog";
 import useIsMobile from "../../utils/useIsMobile";
 import AppLayout from "../../components/AppLayout/AppLayout";
-import colors from "../../styles/colors";
+import colors from "../../../styles/colors";
 import classes from "./category.module.css";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { ExpandMore } from "@mui/icons-material";
