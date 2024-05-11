@@ -200,7 +200,6 @@ function OutOfStock() {
   useEffect(() => {
     fetchFilters();
     //   fetchBestsellers();
-    loadMoreProducts(true);
     return () => {};
   }, []);
 

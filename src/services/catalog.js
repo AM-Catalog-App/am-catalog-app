@@ -25,7 +25,9 @@ const getBestsellers = async (categoryName) => {
 
 const getProducts = async ({ category, startIndex, endIndex, colour, location, search }) => {
     try {
-        const { data } = await axiosInstance.get(`/catalog/products?startIndex=${startIndex}&endIndex=${endIndex}&category=${category}&colour=${colour}&location=${location}&search=${search}`);
+        const encodedCategory = encodeURIComponent(category);
+
+        const { data } = await axiosInstance.get(`/catalog/products?startIndex=${startIndex}&endIndex=${endIndex}&category=${encodedCategory}&colour=${colour}&location=${location}&search=${search}`);
 
         // console.log("data", data)
         return data;

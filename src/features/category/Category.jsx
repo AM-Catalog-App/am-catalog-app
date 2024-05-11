@@ -209,7 +209,6 @@ function Category() {
   useEffect(() => {
     fetchFilters();
     fetchBestsellers();
-    loadMoreProducts();
     return () => {};
   }, []);
 
