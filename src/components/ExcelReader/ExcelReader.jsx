@@ -42,6 +42,12 @@ function ExcelReader() {
     return result ? parseInt(result[0], 10) : null;
   };
 
+  const removeSpacesAroundSpecialChars = (text) => {
+    // Regex explanation:
+    // \s* matches any whitespace characters (space, tab, line break, etc.) zero or more times
+    // ([!-/:-@[-`{-~]) is a character class matching any punctuation character based on ASCII order
+    return text.replace(/\s*([!-/:-@[-`{-~])\s*/g, '$1').toUpperCase();
+  }
 
   const normalizeData = (data) => {
     let requiredData = [];
@@ -65,7 +71,7 @@ function ExcelReader() {
         newRow['size'] = row['SAM Size'];
       }
       if (keys.includes('GARMENT CATEGORY')) {
-        newRow['category'] = newRow['category'] ?? row['GARMENT CATEGORY'];
+        newRow['category'] = newRow['category'] ?? removeSpacesAroundSpecialChars(row['GARMENT CATEGORY']);
       }
       if (keys.includes('BARCODE')) {
         newRow['barcode'] = newRow['barcode'] ?? row['BARCODE'];
