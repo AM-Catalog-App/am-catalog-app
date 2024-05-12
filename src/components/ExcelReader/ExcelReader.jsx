@@ -37,12 +37,22 @@ function ExcelReader() {
     return regex.test(description);
   };
 
+  const extractQuantity = (text) => {
+    const result = text.match(/\d+/);
+    return result ? parseInt(result[0], 10) : null;
+  };
+
+
   const normalizeData = (data) => {
     let requiredData = [];
     let newRow = {};
 
     data.forEach((row, index) => {
-      const keys = Object.keys(row);
+      const keys = Object.keys(row).map((key) => {
+        const trimmedKey = key.trim();
+        row[trimmedKey] = row[key];
+        return trimmedKey;
+      });
       if (keys.includes('SL. NO.')) {
         if (index !== 0) {
           requiredData.push(newRow);
@@ -70,17 +80,17 @@ function ExcelReader() {
       } else if (matchDescriptionKey(description, '^color')) {
         newRow['colour'] = row['__EMPTY'];
       } else if (matchDescriptionKey(description, '^tag')) {
-        newRow['tag'] = '';
-      } else if (matchDescriptionKey(description, '^no[ /]*of[ /]*pcs')) {
-        newRow['quantity'] = row['__EMPTY'];
+        newRow['tag'] = row['__EMPTY'];
+      } else if (matchDescriptionKey(description, '^no\\.?\\s*of\\s*pcs\\s*:?') || matchDescriptionKey(description, '^no[ /]*of[ /]*pcs')) {
+        newRow['quantity'] = extractQuantity(row['__EMPTY']);
       } else if (matchDescriptionKey(description, '^location')) {
         newRow['location'] = row['__EMPTY'];
       }
     });
 
-  requiredData.push(newRow);
-  return requiredData.filter(row => Object.keys(row).length);
-};
+    requiredData.push(newRow);
+    return requiredData.filter(row => Object.keys(row).length);
+  };
 
 
   const handleFileUpload = (event) => {
