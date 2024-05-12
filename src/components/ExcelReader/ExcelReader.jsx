@@ -19,7 +19,6 @@ import { bulkUploadProducts } from "../../services/index";
 import ProductImageUploader from "../ProductImageUploader/ProductImageUploader";
 import styles from "./ExcelReader.module.css";
 import AppLayout from "../../components/AppLayout/AppLayout";
-import AMLogoLeaf from "../../assets/amLogoLeaf.png";
 
 function ExcelReader() {
   const [tableData, setTableData] = useState(null);
@@ -33,16 +32,63 @@ function ExcelReader() {
   const [uploading, setUploading] = useState(false);
   const [selectedProductImageUrls, setSelectedProductImageUrls] = useState([]);
 
-  const findMissingColumns = (columns) => {
-    return PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.filter(
-      (col) => col !== "imageUrls" && !columns.includes(col.toLowerCase())
-    );
+  const matchDescriptionKey = (description, pattern) => {
+    const regex = new RegExp(pattern, 'i');
+    return regex.test(description);
   };
+
+  const normalizeData = (data) => {
+    let requiredData = [];
+    let newRow = {};
+
+    data.forEach((row, index) => {
+      const keys = Object.keys(row);
+      if (keys.includes('SL. NO.')) {
+        if (index !== 0) {
+          requiredData.push(newRow);
+          newRow = {};
+        }
+        newRow['sr no.'] = row['SL. NO.'];
+        newRow['collection'] = row['COLLECTION'];
+        newRow['description'] = row['DESCRIPTION'];
+        newRow['mrp'] = row['Main MRP'];
+        newRow['size'] = row['SAM Size'];
+      }
+      if (keys.includes('GARMENT CATEGORY')) {
+        newRow['category'] = newRow['category'] ?? row['GARMENT CATEGORY'];
+      }
+      if (keys.includes('BARCODE')) {
+        newRow['barcode'] = newRow['barcode'] ?? row['BARCODE'];
+      }
+      if (keys.find(key => matchDescriptionKey(key, 'style code'))) {
+        newRow['style code'] = newRow['style code'] ?? row[keys.find(key => matchDescriptionKey(key, 'style code'))];
+      }
+
+      const description = row['DESCRIPTION'] || '';
+      if (matchDescriptionKey(description, '^title[ /]*one[ /]*liner')) {
+        newRow['product name'] = row['__EMPTY'];
+      } else if (matchDescriptionKey(description, '^color')) {
+        newRow['colour'] = row['__EMPTY'];
+      } else if (matchDescriptionKey(description, '^tag')) {
+        newRow['tag'] = '';
+      } else if (matchDescriptionKey(description, '^no[ /]*of[ /]*pcs')) {
+        newRow['quantity'] = row['__EMPTY'];
+      } else if (matchDescriptionKey(description, '^location')) {
+        newRow['location'] = row['__EMPTY'];
+      }
+    });
+
+  requiredData.push(newRow);
+  return requiredData.filter(row => Object.keys(row).length);
+};
+
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
+    if (!file) return;
+
     // Validate file type
-    const allowedTypes = [
+     const allowedTypes = [
       "application/vnd.ms-excel",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ];
@@ -50,32 +96,23 @@ function ExcelReader() {
       toast.error("Please upload a valid Excel file (.xls or .xlsx)");
       return;
     }
+
     const reader = new FileReader();
     reader.onload = (e) => {
-      const workbook = XLSX.read(e.target.result, { type: "binary" });
-      const worksheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[worksheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-      const columns = jsonData[0].map((header) => header.toLowerCase());
-
-      const missingColumns = findMissingColumns(columns);
-      if (missingColumns.length === 0) {
-        // Process data to convert keys to lowercase
-        const data = XLSX.utils.sheet_to_json(worksheet).map((row) => {
-          let newRow = {};
-          Object.keys(row).forEach((key) => {
-            newRow[key.toLowerCase()] = typeof row[key] === "string" ? row[key].trim() : row[key];
-          });
-          return newRow;
-        });
-        setTableData(data);
-      } else {
-        toast.error(`Missing columns: ${missingColumns.join(", ")}`);
-        reset();
+      try {
+        const workbook = XLSX.read(e.target.result, { type: "binary" });
+        const worksheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[worksheetName];
+        const data = XLSX.utils.sheet_to_json(worksheet);
+        const updatedData = normalizeData(data);
+        setTableData(updatedData);
+      } catch (error) {
+        toast.error("Failed to process the Excel file.");
+        console.error("Excel processing error:", error);
       }
     };
     reader.readAsBinaryString(file);
-  };
+  }
 
   const handleBulkUpload = async () => {
     try {
