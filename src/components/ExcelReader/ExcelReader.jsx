@@ -53,6 +53,8 @@ function ExcelReader() {
     let requiredData = [];
     let newRow = {};
 
+    console.log(requiredData);
+
     data.forEach((row, index) => {
       const keys = Object.keys(row).map((key) => {
         const trimmedKey = key.trim();
@@ -76,9 +78,6 @@ function ExcelReader() {
       if (keys.includes('BARCODE')) {
         newRow['barcode'] = newRow['barcode'] ?? row['BARCODE'];
       }
-      if (keys.find(key => matchDescriptionKey(key, 'style code'))) {
-        newRow['style code'] = newRow['style code'] ?? row[keys.find(key => matchDescriptionKey(key, 'style code'))];
-      }
 
       const description = row['DESCRIPTION'] || '';
       if (matchDescriptionKey(description, '^title[ /]*one[ /]*liner')) {
@@ -91,6 +90,8 @@ function ExcelReader() {
         newRow['quantity'] = extractQuantity(row['__EMPTY']);
       } else if (matchDescriptionKey(description, '^location')) {
         newRow['location'] = row['__EMPTY'];
+      } else if (matchDescriptionKey(description, "^style code")) {
+        newRow["style code"] = row["__EMPTY"];
       }
     });
 
@@ -120,6 +121,7 @@ function ExcelReader() {
         const worksheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[worksheetName];
         const data = XLSX.utils.sheet_to_json(worksheet);
+        console.log(data);
         const updatedData = normalizeData(data);
         setTableData(updatedData);
       } catch (error) {
