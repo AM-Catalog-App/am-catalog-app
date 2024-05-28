@@ -58,7 +58,7 @@ function ExcelReader() {
     data.forEach((row, index) => {
       const keys = Object.keys(row).map((key) => {
         const trimmedKey = key.trim();
-        row[trimmedKey] = row[key];
+        row[trimmedKey] = typeof row[key] === 'string' ? row[key].trim() : row[key];
         return trimmedKey;
       });
       if (keys.includes('SL. NO.')) {
