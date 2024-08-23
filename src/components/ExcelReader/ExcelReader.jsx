@@ -14,7 +14,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { PRODUCT_DETAIL_EXCEL_COLUMN_NAMES } from "../../constants/constants.js";
 import { capitalizeFirstLetter } from "../../utils/index";
 import Modal from "@mui/material/Modal";
-import { Box, Stack, Typography, Button, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Stack,
+  Typography,
+  Button,
+  CircularProgress,
+} from "@mui/material";
 import { bulkUploadProducts } from "../../services/index";
 import ProductImageUploader from "../ProductImageUploader/ProductImageUploader";
 import styles from "./ExcelReader.module.css";
@@ -25,7 +31,8 @@ function ExcelReader() {
   const [uploadResponse, setUploadResponse] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showUploadImageColumn, setShowUploadImageColumn] = useState(false);
-  const [isProductImageUploaderOpen, setIsProductImageUploaderOpen] = useState(false);
+  const [isProductImageUploaderOpen, setIsProductImageUploaderOpen] =
+    useState(false);
   const [selectedProductId, setSelectedProductId] = useState("");
   const [selectedBarCode, setSelectedBarCode] = useState("");
   const [inputKey, setInputKey] = useState(Date.now());
@@ -33,7 +40,7 @@ function ExcelReader() {
   const [selectedProductImageUrls, setSelectedProductImageUrls] = useState([]);
 
   const matchDescriptionKey = (description, pattern) => {
-    const regex = new RegExp(pattern, 'i');
+    const regex = new RegExp(pattern, "i");
     return regex.test(description);
   };
 
@@ -46,8 +53,8 @@ function ExcelReader() {
     // Regex explanation:
     // \s* matches any whitespace characters (space, tab, line break, etc.) zero or more times
     // ([!-/:-@[-`{-~]) is a character class matching any punctuation character based on ASCII order
-    return text.replace(/\s*([!-/:-@[-`{-~])\s*/g, '$1').toUpperCase();
-  }
+    return text.replace(/\s*([!-/:-@[-`{-~])\s*/g, "$1").toUpperCase();
+  };
 
   const normalizeData = (data) => {
     let requiredData = [];
@@ -58,54 +65,59 @@ function ExcelReader() {
     data.forEach((row, index) => {
       const keys = Object.keys(row).map((key) => {
         const trimmedKey = key.trim();
-        row[trimmedKey] = typeof row[key] === 'string' ? row[key].trim() : row[key];
+        row[trimmedKey] =
+          typeof row[key] === "string" ? row[key].trim() : row[key];
         return trimmedKey;
       });
-      if (keys.includes('SL. NO.')) {
+      if (keys.includes("SL. NO.")) {
         if (index !== 0) {
           requiredData.push(newRow);
           newRow = {};
         }
-        newRow['sr no.'] = row['SL. NO.'];
-        newRow['collection'] = row['COLLECTION'];
-        newRow['description'] = row['DESCRIPTION'];
-        newRow['mrp'] = row['Main MRP'];
-        newRow['size'] = row['SAM Size'];
+        newRow["sr no."] = row["SL. NO."];
+        newRow["collection"] = row["COLLECTION"];
+        newRow["description"] = row["DESCRIPTION"];
+        newRow["mrp"] = parseFloat(String(row["Main MRP"]).replace(/,/g, ""));
+        newRow["size"] = row["SAM Size"];
       }
-      if (keys.includes('GARMENT CATEGORY')) {
-        newRow['category'] = newRow['category'] ?? removeSpacesAroundSpecialChars(row['GARMENT CATEGORY']);
+      if (keys.includes("GARMENT CATEGORY")) {
+        newRow["category"] =
+          newRow["category"] ??
+          removeSpacesAroundSpecialChars(row["GARMENT CATEGORY"]);
       }
-      if (keys.includes('BARCODE')) {
-        newRow['barcode'] = newRow['barcode'] ?? row['BARCODE'];
+      if (keys.includes("BARCODE")) {
+        newRow["barcode"] = newRow["barcode"] ?? row["BARCODE"];
       }
 
-      const description = row['DESCRIPTION'] || '';
-      if (matchDescriptionKey(description, '^title[ /]*one[ /]*liner')) {
-        newRow['product name'] = row['__EMPTY'];
-      } else if (matchDescriptionKey(description, '^color')) {
-        newRow['colour'] = row['__EMPTY'];
-      } else if (matchDescriptionKey(description, '^tag')) {
-        newRow['tag'] = row['__EMPTY'];
-      } else if (matchDescriptionKey(description, '^no\\.?\\s*of\\s*pcs\\s*:?') || matchDescriptionKey(description, '^no[ /]*of[ /]*pcs')) {
-        newRow['quantity'] = extractQuantity(row['__EMPTY']);
-      } else if (matchDescriptionKey(description, '^location')) {
-        newRow['location'] = row['__EMPTY'];
+      const description = row["DESCRIPTION"] || "";
+      if (matchDescriptionKey(description, "^title[ /]*one[ /]*liner")) {
+        newRow["product name"] = row["__EMPTY"];
+      } else if (matchDescriptionKey(description, "^color")) {
+        newRow["colour"] = row["__EMPTY"];
+      } else if (matchDescriptionKey(description, "^tag")) {
+        newRow["tag"] = row["__EMPTY"];
+      } else if (
+        matchDescriptionKey(description, "^no\\.?\\s*of\\s*pcs\\s*:?") ||
+        matchDescriptionKey(description, "^no[ /]*of[ /]*pcs")
+      ) {
+        newRow["quantity"] = extractQuantity(row["__EMPTY"]);
+      } else if (matchDescriptionKey(description, "^location")) {
+        newRow["location"] = row["__EMPTY"];
       } else if (matchDescriptionKey(description, "^style code")) {
         newRow["style code"] = row["__EMPTY"];
       }
     });
 
     requiredData.push(newRow);
-    return requiredData.filter(row => Object.keys(row).length);
+    return requiredData.filter((row) => Object.keys(row).length);
   };
-
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
     // Validate file type
-     const allowedTypes = [
+    const allowedTypes = [
       "application/vnd.ms-excel",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ];
@@ -130,7 +142,7 @@ function ExcelReader() {
       }
     };
     reader.readAsBinaryString(file);
-  }
+  };
 
   const handleBulkUpload = async () => {
     try {
@@ -189,112 +201,132 @@ function ExcelReader() {
 
   return (
     <AppLayout>
-
-    
-    <Stack
-      justifyContent="center"
-      alignItems="center"
-      spacing={2}
-      pt={0}
-      mt={0}
-      className={styles.UploadCatalog}
-    >
       <Stack
-        direction="row"
-        alignItems="center"
         justifyContent="center"
-        spacing={3}
-        className={styles.Header}
+        alignItems="center"
+        spacing={2}
+        pt={0}
         mt={0}
+        className={styles.UploadCatalog}
       >
-        <Typography variant="h2">Upload Catalog</Typography>
-        {/* <img src={AMLogoLeaf} alt="AM Logo" className={styles.AMLogoLeaf} /> */}
-      </Stack>
-      <Stack direction="row" alignSelf="flex-start" alignItems="center" spacing={4}>
-        <input
-          id="fileInput"
-          className={styles.UploadFile}
-          type="file"
-          accept=".xlsx, .xls"
-          onChange={handleFileUpload}
-          key={inputKey} // Key to force re-render
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleBulkUpload}
-          className={styles.UploadButton}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="center"
+          spacing={3}
+          className={styles.Header}
+          mt={0}
         >
-          <Stack direction="row" alignItems="center" justifyContent="center" spacing={2}>
-            <Typography variant="body1" color="initial" className={styles.UploadText}>
-              Upload
-            </Typography>
-            {uploading && <CircularProgress className={styles.CircularProgress} />}
-          </Stack>
-        </Button>
-      </Stack>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.map(
-                (header, index) =>
-                  header.toLowerCase() !== "imageurls" && (
-                    <TableCell key={index}>
-                      <Typography variant="h6" color="initial" className={styles.ColumnTitle}>
-                        {capitalizeFirstLetter(header)}
-                      </Typography>
-                    </TableCell>
-                  )
+          <Typography variant="h2">Upload Catalog</Typography>
+          {/* <img src={AMLogoLeaf} alt="AM Logo" className={styles.AMLogoLeaf} /> */}
+        </Stack>
+        <Stack
+          direction="row"
+          alignSelf="flex-start"
+          alignItems="center"
+          spacing={4}
+        >
+          <input
+            id="fileInput"
+            className={styles.UploadFile}
+            type="file"
+            accept=".xlsx, .xls"
+            onChange={handleFileUpload}
+            key={inputKey} // Key to force re-render
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleBulkUpload}
+            className={styles.UploadButton}
+          >
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="center"
+              spacing={2}
+            >
+              <Typography
+                variant="body1"
+                color="initial"
+                className={styles.UploadText}
+              >
+                Upload
+              </Typography>
+              {uploading && (
+                <CircularProgress className={styles.CircularProgress} />
               )}
-              {showUploadImageColumn && (
-                <TableCell>
-                  <Typography variant="h6" color="initial" className={styles.ColumnTitle}>
-                    Upload Image
-                  </Typography>
-                </TableCell>
-              )}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tableData !== null &&
-              tableData.map((row, rowIndex) => (
-                <TableRow key={rowIndex}>
-                  {PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.map((header, colIndex) => {
-                    if (header.toLowerCase() !== "imageurls") {
-                      if (header === "sr no.") {
-                        return <TableCell key={colIndex}>{rowIndex + 1}</TableCell>;
-                      }
-                      if (header === "product name") {
-                        return (
-                          <TableCell key={colIndex}>{row[header] || row["productName"]}</TableCell>
-                        );
-                      }
-                      if (header === "style code") {
-                        return (
-                          <TableCell key={colIndex}>{row[header] || row["styleCode"]}</TableCell>
-                        );
-                      }
-                      return <TableCell key={colIndex}>{row[header]}</TableCell>;
-                    }
-                  })}
-                  {showUploadImageColumn && (
-                    <TableCell>
-                      <Stack direction="row" spacing={2}>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() => {
-                            setIsProductImageUploaderOpen(true);
-                            setSelectedProductId(row._id);
-                            setSelectedBarCode(row.barcode);
-                            setSelectedProductImageUrls(row.imageUrls);
-                          }}
-                          className={styles.UploadButton}
+            </Stack>
+          </Button>
+        </Stack>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                {PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.map(
+                  (header, index) =>
+                    header.toLowerCase() !== "imageurls" && (
+                      <TableCell key={index}>
+                        <Typography
+                          variant="h6"
+                          color="initial"
+                          className={styles.ColumnTitle}
                         >
-                          Upload
-                        </Button>
-                        {row.imageUrls.length > 0 && (
+                          {capitalizeFirstLetter(header)}
+                        </Typography>
+                      </TableCell>
+                    )
+                )}
+                {showUploadImageColumn && (
+                  <TableCell>
+                    <Typography
+                      variant="h6"
+                      color="initial"
+                      className={styles.ColumnTitle}
+                    >
+                      Upload Image
+                    </Typography>
+                  </TableCell>
+                )}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {tableData !== null &&
+                tableData.map((row, rowIndex) => (
+                  <TableRow key={rowIndex}>
+                    {PRODUCT_DETAIL_EXCEL_COLUMN_NAMES.map(
+                      (header, colIndex) => {
+                        if (header.toLowerCase() !== "imageurls") {
+                          if (header === "sr no.") {
+                            return (
+                              <TableCell key={colIndex}>
+                                {rowIndex + 1}
+                              </TableCell>
+                            );
+                          }
+                          if (header === "product name") {
+                            return (
+                              <TableCell key={colIndex}>
+                                {row[header] || row["productName"]}
+                              </TableCell>
+                            );
+                          }
+                          if (header === "style code") {
+                            return (
+                              <TableCell key={colIndex}>
+                                {row[header] || row["styleCode"]}
+                              </TableCell>
+                            );
+                          }
+                          return (
+                            <TableCell key={colIndex}>{row[header]}</TableCell>
+                          );
+                        }
+                      }
+                    )}
+                    {showUploadImageColumn && (
+                      <TableCell>
+                        <Stack direction="row" spacing={2}>
                           <Button
                             variant="contained"
                             color="primary"
@@ -304,43 +336,57 @@ function ExcelReader() {
                               setSelectedBarCode(row.barcode);
                               setSelectedProductImageUrls(row.imageUrls);
                             }}
-                            className={styles.ViewButton}
+                            className={styles.UploadButton}
                           >
-                            View
+                            Upload
                           </Button>
-                        )}
-                      </Stack>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <ToastContainer />
-      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        {renderModalContent()}
-      </Modal>
-      {isProductImageUploaderOpen && (
-        <ProductImageUploader
-          productId={selectedProductId}
-          barcode={selectedBarCode}
-          open={isProductImageUploaderOpen}
-          onClose={() => setIsProductImageUploaderOpen(false)}
-          imageUrls={selectedProductImageUrls}
-          onSuccessfulUpload={(imageUrls) => {
-            const tableDataClone = JSON.parse(JSON.stringify(tableData));
-            for (let index = 0; index < tableDataClone.length; index++) {
-              if (tableDataClone[index]["_id"] === selectedProductId) {
-                tableDataClone[index]["imageUrls"] = imageUrls;
-                break;
+                          {row.imageUrls.length > 0 && (
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              onClick={() => {
+                                setIsProductImageUploaderOpen(true);
+                                setSelectedProductId(row._id);
+                                setSelectedBarCode(row.barcode);
+                                setSelectedProductImageUrls(row.imageUrls);
+                              }}
+                              className={styles.ViewButton}
+                            >
+                              View
+                            </Button>
+                          )}
+                        </Stack>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <ToastContainer />
+        <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+          {renderModalContent()}
+        </Modal>
+        {isProductImageUploaderOpen && (
+          <ProductImageUploader
+            productId={selectedProductId}
+            barcode={selectedBarCode}
+            open={isProductImageUploaderOpen}
+            onClose={() => setIsProductImageUploaderOpen(false)}
+            imageUrls={selectedProductImageUrls}
+            onSuccessfulUpload={(imageUrls) => {
+              const tableDataClone = JSON.parse(JSON.stringify(tableData));
+              for (let index = 0; index < tableDataClone.length; index++) {
+                if (tableDataClone[index]["_id"] === selectedProductId) {
+                  tableDataClone[index]["imageUrls"] = imageUrls;
+                  break;
+                }
               }
-            }
-            setTableData(tableDataClone);
-          }}
-        />
-      )}
-    </Stack>
+              setTableData(tableDataClone);
+            }}
+          />
+        )}
+      </Stack>
     </AppLayout>
   );
 }
