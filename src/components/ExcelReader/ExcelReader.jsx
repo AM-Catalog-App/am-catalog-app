@@ -19,7 +19,6 @@ import { bulkUploadProducts } from "../../services/index";
 import ProductImageUploader from "../ProductImageUploader/ProductImageUploader";
 import styles from "./ExcelReader.module.css";
 import AppLayout from "../../components/AppLayout/AppLayout";
-import AMLogoLeaf from "../../assets/amLogoLeaf.png";
 
 function ExcelReader() {
   const [tableData, setTableData] = useState(null);

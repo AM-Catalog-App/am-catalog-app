@@ -6,12 +6,6 @@ import {
   BottomNavigationAction,
   Paper,
   Typography,
-  //   Container,
-  //   List,
-  //   ListItemButton,
-  //   ListItemAvatar,
-  //   ListItemText,
-  //   Avatar,
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
@@ -19,6 +13,8 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HomeIcon from "@mui/icons-material/Home";
 import colors from "../../styles/colors";
 import { useNavigate, useLocation } from "react-router-dom";
+import { BOTTOM_NAVIGATION_VALUES } from "../../constants/constants";
+
 
 function AppLayout({ children }) {
   return (
@@ -41,29 +37,35 @@ export default AppLayout;
 
 export function FixedBottomNavigation() {
   const location = useLocation();
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [value, setValue] = useState("");
-
   const ref = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Extract the current pathname from the location
     let { pathname } = location;
-    pathname = pathname.replace("/", "");
+    pathname = pathname.replace("/", "").split("/")[0];
+    setValue(BOTTOM_NAVIGATION_VALUES[pathname]);
 
-    // Set the value based on the pathname
-    setValue(pathname === "out-of-stock" ? pathname : "catalog");
+    const isAdminLoggedIn = localStorage.getItem("isAdminLoggedIn") === "true";
+    setIsLoggedIn(isAdminLoggedIn);
   }, [location]);
 
   const handleNavigate = (pageLink) => {
-    navigate(`/${pageLink}`);
+    if (pageLink === "admin") {
+      if (isLoggedIn) {
+        navigate("/admin");
+      } else {
+        navigate("/login");
+      }
+    } else {
+      navigate(`/${pageLink}`);
+    }
   };
 
   return (
     <Box sx={{ pb: 5 }} ref={ref}>
       <CssBaseline />
-
       <Paper
         sx={{
           position: "fixed",
@@ -94,6 +96,7 @@ export function FixedBottomNavigation() {
             icon={<MenuIcon />}
             value={"out-of-stock"}
           />
+
           <BottomNavigationAction
             label={<Typography variant="body2">Admin</Typography>}
             icon={<AccountCircleIcon />}

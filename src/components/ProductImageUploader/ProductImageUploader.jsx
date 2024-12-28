@@ -26,6 +26,7 @@ function ProductImageUploader({
   onSuccessfulUpload,
 }) {
   const [images, setImages] = useState(imageUrls);
+  const [removedImages, setRemovedImages] = useState([]);
   const [uploading, setUploading] = useState(false);
 
   const handleImageUpload = (event) => {
@@ -34,7 +35,11 @@ function ProductImageUploader({
       const reader = new FileReader();
       reader.onload = () => {
         const imageData = reader.result;
-        setImages((prevImages) => [...prevImages, imageData]);
+        if (!images.includes(imageData)) {
+          setImages((prevImages) => [...prevImages, imageData]);
+        } else {
+          alert("This image is already added.");
+        }
       };
       reader.readAsDataURL(file);
     });
@@ -42,11 +47,15 @@ function ProductImageUploader({
 
   const handleDeleteImage = (index) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    if (images[index].includes("http")) {
+      setRemovedImages((prevImages) => [...prevImages, images[index]]);
+    }
     console.log(index, "delete image");
   };
 
   const handleCancel = () => {
     setImages([]);
+    setRemovedImages([]);
     onClose();
   };
 
@@ -55,11 +64,15 @@ function ProductImageUploader({
       setUploading(true);
       const filteredImages = images.filter((image) => !image.includes("http"));
       const imageDataArray = filteredImages.map((image, index) => ({
-        fileName: `${normalizeString(barcode)}/image-${index + 1}`,
+        fileName: `${normalizeString(barcode)}/image-${imageUrls.length + 1}`,
         data: image.split(",")[1], // Extract the base64 data
       }));
 
-      const uploadedImagesUrl = await uploadProductImages(imageDataArray, productId);
+      const uploadedImagesUrl = await uploadProductImages(
+        imageDataArray,
+        removedImages,
+        productId
+      );
       onSuccessfulUpload(uploadedImagesUrl);
       setUploading(false);
 
@@ -98,7 +111,11 @@ function ProductImageUploader({
       </DialogContent>
       <DialogActions>
         <Button variant="contained" color="secondary" onClick={handleCancel}>
-          <Typography variant="body2" color="initial" className={styles.UploadText}>
+          <Typography
+            variant="body2"
+            color="initial"
+            className={styles.UploadText}
+          >
             Cancel
           </Typography>
         </Button>
@@ -108,11 +125,22 @@ function ProductImageUploader({
           onClick={handleDone}
           className={styles.UploadButton}
         >
-          <Stack direction="row" alignItems="center" justifyContent="center" spacing={2}>
-            <Typography variant="body2" color="initial" className={styles.UploadText}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+            spacing={2}
+          >
+            <Typography
+              variant="body2"
+              color="initial"
+              className={styles.UploadText}
+            >
               Upload
             </Typography>
-            {uploading && <CircularProgress className={styles.CircularProgress} />}
+            {uploading && (
+              <CircularProgress className={styles.CircularProgress} />
+            )}
           </Stack>
         </Button>
       </DialogActions>

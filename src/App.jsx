@@ -11,6 +11,8 @@ import Category from "./features/category/Category";
 import ClientProductDetail from "./features/clientProductDetail/ClientProductDetail";
 import UpdateCategory from "./components/UpdateCategory/UpdateCategory";
 import OutOfStock from "./features/outOfStock/OutOfStock";
+import AdminProductDetail from "./features/adminProductDetail/AdminProductDetail";
+import LoginForm from "./components/Login/Login";
 
 function App() {
   return (
@@ -18,11 +20,16 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Welcome />} />
+          <Route path="/login" element={<LoginForm />} />
           <Route path="/admin" element={<AdminPortal />} />
           <Route path="/uploadCatalog" element={<ExcelReader />} />
           <Route path="/catalog" element={<Catalog />} />
-          <Route path="/updateCategory" element={<UpdateCategory />}/>
+          <Route path="/updateCategory" element={<UpdateCategory />} />
           <Route path="/category/:categoryName" element={<Category />} />
+          <Route
+            path="/admin-product-detail/:barCode"
+            element={<AdminProductDetail />}
+          />
           <Route
             path="/product-detail/:barCode"
             element={<ClientProductDetail />}

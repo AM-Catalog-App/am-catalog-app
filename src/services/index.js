@@ -12,16 +12,17 @@ export const bulkUploadProducts = async (products) => {
   }
 };
 
-export const uploadProductImages = async (imageDataArray, productId) => {
+export const uploadProductImages = async (imageDataArray, removedImages, productId) => {
   const url = "/admin/upload-product-images";
 
   const headers = {
     "Content-Type": "application/json",
     "X-Product-Id": productId,
   };
+  const body = { imageDataArray, removedImages }
 
   try {
-    const response = await axiosInstance.post(url, imageDataArray, { headers });
+    const response = await axiosInstance.post(url, body, { headers });
 
     return response.data;
   } catch (error) {
@@ -41,3 +42,28 @@ export const updateCategoryImage = async (imageData) => {
     throw error;
   }
 };
+
+
+export const updateProductDetails = async (formData) => {
+  const url = "/admin/update-product-details";
+  try {
+    const response = await axiosInstance.post(url, formData);
+    return response.data;
+  } catch (error) {
+    console.error("Upload failed", error.response?.status, error.response?.data);
+    throw error;
+  }
+};
+
+
+export const login = async (username, password) => {
+  const url = "/user/login";
+  try {
+    const response = await axiosInstance.post(url, { username, password });
+    return response.data;
+  } catch (error) {
+    console.error("Upload failed", error.response?.status, error.response?.data);
+    throw error;
+  }
+};
+
