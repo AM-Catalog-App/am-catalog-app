@@ -296,7 +296,9 @@ function Category() {
   };
   const handleProductClick = (barCode) => {
     const encodedBarCode = encodeURIComponent(barCode);
-    navigate(`/product-detail/${encodedBarCode}`);
+    if (localStorage.getItem("isAdminLoggedIn") === "true")
+      navigate(`/admin-product-detail/${encodedBarCode}`);
+    else navigate(`/product-detail/${encodedBarCode}`);
   };
 
   const DebouncedSearch = debounce(handleSearchChange, 500); // 500 ms is the current delay
